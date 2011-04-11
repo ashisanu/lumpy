@@ -1,0 +1,35 @@
+#summary What's to do?
+
+= Introduction =
+
+Lumpy is a fast growing language. There are several things to do.
+Lumpy uses a "milestone system". Every milestone is an important point in the development of the project.
+
+= Details =
+ * Milestone 0: (Current): Implement _core_ features.
+ * Milestone 1: Implement all language features (look at "future syntax")
+ * Milestone 2: Simple standard library for input/output, datastructures and general bugfixing
+ * Milestone 3: Compile and execute under linux and Mac OS X
+ * Milestone 4: Libraries for:
+   # Graphics
+      # OpenGL Driver
+      # DirectX Driver
+   # Network
+      # UDP
+      # TCP
+   # Keyboard/Mouse
+   # Sound
+   # GUI
+   # System
+   # IO System
+ * Milestone 5: Simple IDE
+ * Milestone 6: New platform: HTML5 (Java Script) with Libraries:
+    # Graphics
+    # Keyboard/Mouse
+    # Sound
+    # System
+    # IO System
+ * Milestone 7: New platform: GP2X Wiz and Open Pandora with all Libraries (except GUI for GP2X Wiz).
+ * Milestone 8: Fixing bugs bugs bugs and more bugs.
+
+
