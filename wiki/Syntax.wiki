@@ -9,7 +9,7 @@ Text within [] are optional.
 
 Lumpy is case insensitive. That means, it does not matter if you type "iF","IF" or "if".
 
-Lumpy only know "private" and "public" for information hinding within classes. "private" acts like "protected" in Java. "public" acts like in java.
+Lumpy only knows "private" and "public" for information hinding within classes. "private" acts like "protected" in Java. "public" acts like in java.
 
 Lumpy uses type inference. That means, you often (not always) need not to specify the datatype of a variable. Only in connection with templates,extern functions or metafunctions you HAVE TO. Sometimes the compiler can't find the datatype of a class attribute. 
 
