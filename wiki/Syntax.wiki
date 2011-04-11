@@ -138,6 +138,14 @@ class<Datatype> container
    public function get() //type inference
        return this.value
    end
+   public function new() end
+end
+function program()
+   var cont = new container<string>, cont2 = new container<int>
+   cont.set "hello"
+   cont2.set 42
+   print cont.get()
+   print cont2.get()
 end
 }}}
 
