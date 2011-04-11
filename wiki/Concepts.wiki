@@ -1,0 +1,16 @@
+#summary Concepts of lumpy.
+
+= Introduction =
+
+What concepts does Lumpy use?
+
+
+= Details =
+
+ * KISS: Keep It Simple, Stupid
+ * You only pay, for what you use: Don't let the programmer pay for things he is not responsible for (performance).
+ * Do what you want 'cause a pirate is free: You can do everything with lumpy you want.
+ * Objectoriented programming
+ * Dataflow based programming
+ * imperative programming
+ * generic programming 
