@@ -1,0 +1,165 @@
+#summary Future syntax elements of Lumpy
+
+= Introduction =
+
+Lumpy will contain more features. Such as namespaces, data flow based programming and much more.
+
+
+= Details =
+
+== namespace ==
+{{{
+namespace std
+    class test
+        public function new() end
+    end
+end
+namespace program
+    function program()
+        var test = new std.test()
+    end
+end
+}}}
+
+== exception ==
+{{{
+try
+    var test:object = null
+    test.toString
+end
+catch NullPointerException ex
+    print ex.toString()
+finally
+    print "yeah"
+end
+}}}
+
+== flow based programming ==
+{{{
+var a, b
+b = 100
+a => b
+print b //100
+a = 200
+print b //200
+
+//or
+var c
+c => function:void(parameter:int)
+         print "value: "+string(parameter)
+     end
+c = 200 //value: 200
+
+//or
+var d,e
+d <=> e
+d = 200
+e = 300
+print d //300
+}}}
+
+== enum ==
+{{{
+enum color
+    BLUE = 10
+    GREEN = 20
+    YELLOW = 30
+end
+//or:
+enum color2
+    BLUE GREEN YELLOW //automatic
+end
+
+function program()
+    print color.Blue
+end
+}}}
+
+== function template ==
+{{{
+function<Datatype> add:datatype(left:datatype,right:datatype)
+    return left + right
+end
+}}}
+
+== meta functions (operator overloading) ==
+Overloadable operators:
++,-,*,/,and,or,not,<,>,<=,>=,!=
+{{{
+meta function <:boolean(left:String, Right:String)
+    return left.length < right.length
+end
+function program()
+    print "lol" < "rofl"
+end
+}}}
+
+== indexer ==
+{{{
+public property fakeArray[index:int]
+    get
+        return this.array[index]
+    end
+    set
+        this.array[index] = value
+    end
+end
+}}}
+
+== const ==
+{{{
+const lol = 10
+lol = 100 //error
+}}}
+
+== interfaces ==
+{{{
+interface comperable
+    public const:int test = 200
+    public compareTo:boolean(other:object)
+end
+class test < object implements comperable
+ //...
+end
+}}}
+
+
+== call by refernce ==
+{{{
+function swap(ref left:int, ref right:int)
+    var tmp = left
+    left = right
+    right = tmp
+end
+function program()
+    var i = 10, j = 20
+    swap i, j
+    print i //20
+    print j //10
+end
+}}}
+
+== default parameter values ==
+{{{
+function default(var1:int = 100, var2:string = "Hello") end
+function program()
+    default
+end
+}}}
+
+== slicing (Array)==
+{{{
+var array = new int[20]
+print array[..10] //creates a new array with first 10 elements
+print array[10..] //creates a new array with 10 - 49
+print array[4 .. 6] //elements from 4 to 6
+print array[..-2] //last two elements
+print array[..] //creates a new copy
+}}}
+
+== automatic array generation ==
+{{{
+for var i in [10,20,30,40]
+    print i //10 20 30 40
+end
+}}}
