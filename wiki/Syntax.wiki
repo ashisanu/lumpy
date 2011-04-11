@@ -39,11 +39,11 @@ end
 {{{
 select expression
     case expression
-        block
+        code
     case expression
-        block
+        code
     default
-        block
+        code
 end
 }}}
 
