@@ -29,6 +29,7 @@ try
 end
 catch NullPointerException ex
     print ex.toString()
+end
 finally
     print "yeah"
 end
