@@ -1,0 +1,21 @@
+$IMPORT_CODE
+
+
+$MAIN_CODE
+typedef struct _object_ {
+	int typid;
+	int superclass;
+} object;
+
+int main(int argc, char *argv[]) {
+	GCInit();
+	
+	function_program();
+	
+	GCDeInit();
+	
+	return 0;
+}
+$ENDMAIN_CODE
+
+$FUNCTION_CODE
