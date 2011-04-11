@@ -1,0 +1,169 @@
+#summary Basic syntax of Lumpy
+#labels Featured
+
+= Introduction =
+
+The syntax of Lumpy is a mixture of Python and Java (and a little bit Lua). But it has its own "loop" syntax.
+
+Text within [] are optional.
+
+
+All features are fully working (except the "extern" statement.):
+= Details =
+
+
+== if: ==
+{{{
+if expression [do]
+    code
+end
+elseif expression [do]
+    code
+end
+else [do]
+    code
+end
+}}}
+
+== select: ==
+{{{
+select expression
+    case expression
+        block
+    case expression
+        block
+    default
+        block
+end
+}}}
+
+== while loop: ==
+{{{
+loop expression [do]
+    code
+end
+}}}
+
+== for loop: ==
+{{{
+loop var i = , i < 10, i = i +1 [do]
+   code
+end
+//or:
+loop var i = 0 to 10 [step 2] [do]
+   code
+end
+}}}
+
+== foreach loop: ==
+{{{
+loop var i in collection
+   code
+end
+}}}
+
+== (local) variable: ==
+{{{
+var i:int //explicit datatype
+var:int j, k, l //one datatype for all
+var m = 10 //type inference
+}}}
+
+== function: ==
+{{{
+function func1(var1,var2,var3) [do] //datatypes via typeinference
+   var1 = "lol"
+   var2 = 10.4
+   var3 = var1
+
+   return var1
+end
+
+//anonymous function:
+var func = function:int(input:string)
+    print input + "\n"
+    return 20
+end
+func()
+
+//overloading
+function func1(var1:float,var2,var3)
+   return func1(string(var1),var2,var3)
+end
+}}}
+
+== class: ==
+{{{
+class testClass < baseClass //inherits all members and methods, no multiple inheritance
+    private var attribute = 10 //attribute
+    
+    public function testMethod:void() //method
+    end
+    
+    public function new(value) //constructor
+        super.new(value)
+    end
+end
+}}}
+
+== property: ==
+{{{
+public property var
+   get
+      return this._var
+   end
+   set
+      this._var = var
+   end
+end
+}}}
+
+== templates: ==
+{{{
+class<Datatype> container
+   private var:Datatype value
+   public function set(val:Datatype)
+       this.value = val
+   end
+   public function get() //type inference
+       return this.value
+   end
+end
+}}}
+
+== generators: ==
+{{{
+class containerClass
+    public generator:int(start:int)
+        for var i = start to start + 10
+            yield return i
+        end
+        yield break //optional
+    end
+    public function new() end
+end
+function program()
+    var gen = new containerClass()
+    gen.start
+    loop gen.hasnext()
+        print gen.invoke(10)
+    end
+    //or:
+    for var i in gen
+        print i
+    end
+end
+}}}
+
+== extern (interacting with libraries): ==
+{{{
+extern
+    function func:void(lol1:float,lol:string) //no type inference
+    // does not work yet
+    var test:int
+    class test //no inheritance allowed
+        public var test:int, lol:float  //only public
+        //no methods and constructor allowed.
+    end
+end
+}}}
