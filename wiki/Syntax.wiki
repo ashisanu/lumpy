@@ -7,6 +7,16 @@ The syntax of Lumpy is a mixture of Python and Java (and a little bit Lua). But 
 
 Text within [] are optional.
 
+Lumpy is case insensitive. That means, it does not matter if you type "iF","IF" or "if".
+
+Lumpy only know "private" and "public" for information hinding within classes. "private" acts like "protected" in Java. "public" acts like in java.
+
+Lumpy uses type inference. That means, you often (not always) need not to specify the datatype of a variable. Only in connection with templates,extern functions or metafunctions you HAVE TO. Sometimes the compiler can't find the datatype of a class attribute. 
+
+
+Lumpy handles nearly everything as an object. Except the primitive datatypes "int","byte","short","long","boolean","float","double" are no objects. Arrays and strings are of course objects.
+
+
 
 All features are fully working (except the "extern" statement.):
 = Details =
@@ -153,6 +163,31 @@ function program()
         print i
     end
 end
+}}}
+
+== array ==
+{{{
+var array = new int[10][10]
+array[2][3] = 100
+print array[2][3]
+}}}
+
+== language ==
+{{{
+language c
+   import "header.h"
+end
+}}}
+
+== (cyclic) imports ==
+{{{
+//file a:
+import b
+//file b:
+import a
+
+import "file.h" //header files
+import "file.o" //object files
 }}}
 
 == extern (interacting with libraries): ==
