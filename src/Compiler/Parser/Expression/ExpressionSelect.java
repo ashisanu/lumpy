@@ -22,7 +22,7 @@ public abstract class ExpressionSelect extends Expression {
      * @param blocks
      */
     public ExpressionSelect(Parser p, Expression start, LinkedList<Expression> conds, LinkedList<ExpressionBlock> blocks,ExpressionBlock def) {
-        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.start = start;
         this.conds = conds;
         this.blocks = blocks;

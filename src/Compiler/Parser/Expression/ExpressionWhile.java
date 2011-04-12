@@ -17,7 +17,7 @@ public abstract class ExpressionWhile extends Expression {
      * @param block
      */
     public ExpressionWhile(Parser p,Expression condition,ExpressionBlock block) {
-        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.condition = condition;
         this.block = block;
     }

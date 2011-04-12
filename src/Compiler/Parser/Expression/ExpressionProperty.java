@@ -15,7 +15,7 @@ public abstract class ExpressionProperty extends ExpressionIdentifier {
     protected Expression value;
 
     public ExpressionProperty(Parser p,Property prop,ExpressionIdentifier self) {
-        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.prop = prop;
         this.self = self;
     }

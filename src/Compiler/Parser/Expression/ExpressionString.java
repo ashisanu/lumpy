@@ -16,7 +16,7 @@ public abstract class ExpressionString extends Expression {
      * @param num
      */
     public ExpressionString(Parser p, String num) {
-        super(p,new Datatype(Datatype.STRING_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.STRING_DATATYPE,0,null));
 
         this.number = num;
     }

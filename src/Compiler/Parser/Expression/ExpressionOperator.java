@@ -15,18 +15,21 @@ public abstract class ExpressionOperator extends Expression {
     public ExpressionOperator(Parser p, Operator op, Expression left, Expression right) throws SyntaxException {
         super(p, left.getDatatype());
         if (op.getReturn() != -1) {
-            this.setDatatype(new Datatype(op.getReturn(),0,null,null));
+            this.setDatatype(new Datatype(op.getReturn(),0,null));
         }
         this.op = op;
         this.left = left;
         this.right = right;
 
         if (left.getDatatype().getDimensions() == 0) {
+            if (op.getName().equals("==") || op.getName().equals("!=")) {
+                return;
+            }
             if (!left.getDatatype().match(right.getDatatype())) {
                 p.error(left.getDatatype().generateErrorMsg(right.getDatatype()));
             }
             for (int data: op.getPossibleDatatypes()) {
-                if (new Datatype(data,0,null,null).match(left.getDatatype())) return;
+                if (new Datatype(data,0,null).match(left.getDatatype())) return;
             }
         }
         p.error("Operator '"+op.getName()+"' got wrong datatype '"+left.getDatatype()+"'");

@@ -20,7 +20,7 @@ public abstract class ExpressionFor extends Expression {
      * @param increment
      */
     public ExpressionFor(Parser p, Expression init, Expression cond, Expression increment,ExpressionBlock block) {
-        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.init = init;
         this.cond = cond;
         this.increment = increment;

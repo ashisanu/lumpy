@@ -14,11 +14,14 @@ public abstract class ExpressionDeclaration extends Expression {
     private LinkedList<Variable> decVar;
     private LinkedList<Expression> values;
     protected boolean onlySet = false;
+    protected boolean inGenerator;
+    
     public ExpressionDeclaration(Parser parser, LinkedList<Variable> decVar, LinkedList<Expression> values,boolean onlySet) throws SyntaxException {
-        super(parser,new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(parser,new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.decVar = decVar;
         this.values = values;
         this.onlySet = onlySet;
+        this.inGenerator = parser.isInGenerator();
         //benutze variable (und setze wenn nötig datentyp)
         int i = 0;
         while (i < decVar.size()) {

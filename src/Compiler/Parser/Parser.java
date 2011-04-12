@@ -43,7 +43,6 @@ public abstract class Parser {
     private Class currentClass; //Die aktuelle Klasse
     private String filePath;
     private LinkedList<Class> classes;
-    private LinkedList<Datatype> templates; // aktuelle templates.
     private boolean noDoubleDeclaration = true; // in "var" keine doppelten deklarationen
     private boolean inExtern = false; //In einem extern block
     private boolean inGenerator = false; //in einem generator block
@@ -53,6 +52,7 @@ public abstract class Parser {
     private CodeFunction lastFunc = null;
     private LinkedList<ExpressionFunctionDeclaration> funcDecs;
     private HashMap<String,String> replacer;
+    private LinkedList<Datatype> currentTemplates;
 
     /**
      * Parst eine Datei mit dem gegebenen Analyser
@@ -162,7 +162,7 @@ public abstract class Parser {
             if (func.getName().equals("program")) {
                 func.use();
                 
-                compileFunction(func,false);
+                compileFunction(func);
                 break;
             }
         }
@@ -241,7 +241,7 @@ public abstract class Parser {
     /**
      * Kompiliert eine Funktion
      */
-    public void compileFunction(Function func,boolean generator) throws SyntaxException {
+    public void compileFunction(Function func) throws SyntaxException {
         if (func.isCompiled()) return;
         func.compile();
         Token safe = getCurrent();
@@ -249,11 +249,12 @@ public abstract class Parser {
 
         Scope tmp = currentScope;
         Class tmpClass = currentClass;
+        boolean tmpGen = inGenerator;
         if (func instanceof CodeFunction) {
             CodeFunction codeFunc = (CodeFunction)func;
             currentClass = codeFunc.getScope().getOwnerClass();
             if (codeFunc.getScope().getParser() != this) {
-                codeFunc.getScope().getParser().compileFunction(func,generator);
+                codeFunc.getScope().getParser().compileFunction(func);
             } else {
                 //CodeFunction => kompiliere
                 currentScope = codeFunc.getScope();
@@ -270,10 +271,24 @@ public abstract class Parser {
                     getNext();
                     Function tmpF = currentFunction;
                     currentFunction = codeFunc;
-                    HashMap<String, String> tmpRepl = replacer;
-                    if (currentClass != null) replacer = currentClass.getReplacer();
+
+                    boolean generator = false;
+                    if (codeFunc.isGenerator()) {
+                        inGenerator = true;
+                        generator = true;
+                    }
+                    HashMap<String, String> tmpReplacer = replacer;
+                    if (currentClass != null) {
+                        tmpReplacer = currentClass.getReplacer();
+                    }
+
+
                     ExpressionBlock funcBlock = block(generator); //nun den block parsen
-                    replacer = tmpRepl;
+                    replacer = tmpReplacer;
+                    
+                    if (codeFunc.isGenerator()) {
+                        inGenerator = true;
+                    }
                     
                     codeFunc.setBlock(funcBlock);
                     for (Variable par: codeFunc.getParameter()) {
@@ -281,17 +296,17 @@ public abstract class Parser {
                     }
 
                     if (codeFunc.getDatatype() == null) {
-                        codeFunc.setDatatype(new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+                        codeFunc.setDatatype(new Datatype(Datatype.VOID_DATATYPE,0,null));
                     }
-                
-                
-                
+
                     ExpressionReturn exprRet = null;
                     if (codeFunc.getScope().getOwnerClass() != null && codeFunc.getName().equals("new")) {
                         exprRet = getManager().getReturnExpression(getManager().getVariableExpression(codeFunc.getScope().getVariable("this")));
                     } else {
                         exprRet = getManager().getReturnExpression(codeFunc.getDatatype().createDatatypeExpression(getManager()));
                     }
+
+                    
                     funcBlock.addLine(exprRet);
 
                     currentFunction = tmpF;
@@ -309,6 +324,7 @@ public abstract class Parser {
 
         currentClass = tmpClass;
         currentScope = tmp;
+        inGenerator = tmpGen;
     }
     /**
      * Parst eine Zeile, MUSS mit \n enden
@@ -529,7 +545,7 @@ public abstract class Parser {
         for (Function func : functions) {
             if (func.getName().equals(funcName) && !func.isCompiled() && func instanceof CodeFunction) {
                 //möglich dass es aufgerufen wird => kompiliere
-                compileFunction(func,false);
+                compileFunction(func);
             }
             if (func.match(funcName, parameters)) {
                 call = func;
@@ -538,6 +554,7 @@ public abstract class Parser {
         }
 
         if (call != null) {
+            call.use();
             //aufrufen
             if (!call.isPublic()) {
                 if (currentClass == null || !currentClass.getMethods().contains(call)) {
@@ -623,7 +640,7 @@ public abstract class Parser {
 
 
                         if (!(Datatype.Name2Int(getCurrent().getText()) == -1 || getCurrent().getText().equals("null"))) {
-                            d = new Datatype(Datatype.Name2Int(getCurrent().getText()),0,null,null);
+                            d = new Datatype(Datatype.Name2Int(getCurrent().getText()),0,null);
                             getNext();
                         } else {
                             d = variableExpression().getDatatype();
@@ -633,60 +650,11 @@ public abstract class Parser {
                         
                     }
                     match(">");
-                    Datatype data = new Datatype(Datatype.Name2Int(typ),0,null,temps);
                     Class c = Class.getClassByName(typ);
-                    if (!new Datatype(data,data.getDimensions(),data.getParameters(),c.getGenerics()).match(data)) {
-                        //schauen ob es die klasse bereits gibt
-                        boolean alreadyExist = false;
-                        Class findClass = null;
-                        for (Class testC: Class.getClasses()) {
-                            if (c.getName().equals(testC.getName())) {
-                                //generics prüfen
-
-                                if (testC.getGenerics() != null && temps != null) {
-                                    if (testC.getGenerics().size() == temps.size()) {
-                                        int i = 0;
-                                        boolean allTrue = false;
-                                        for (Datatype d: testC.getGenerics()) {
-                                            if (d.getName().equals(temps.get(i).getName())) {
-                                                allTrue = true;
-                                            } else {
-                                                allTrue = false;
-                                                break;
-                                            }
-                                            i++;
-                                        }
-                                        if (allTrue) {
-                                            findClass = testC;
-                                            alreadyExist = true;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-                        if (!alreadyExist) {
-                            Token tmp = getCurrent();
-                            ListIterator tmp2 = iterator;
-                            iterator = tokens.listIterator(tokens.indexOf( c.getStartToken() ));
-                            getNext();
-                            LinkedList<Datatype> templ = templates;
-                            this.templates = temps;
-                            keyWord();
-                            typ = Class.getClasses().getLast().getName();
-                            templates = templ;
-                            data = Datatype.getClasses().getLast();
-                            iterator = tmp2;
-                            current = tmp;
-                        } else {
-                            typ = findClass.getName();
-                            data = findClass;
-                        }
-                    }
+                    typ = compileGenericClass(c, temps);
                 }
                 if (isToken("(")) {
-                    Datatype data = new Datatype(Datatype.Name2Int(typ),0,null,templates);
+                    Datatype data = new Datatype(Datatype.Name2Int(typ),0,null);
                     Class c = Class.getClassByName(data.getName());
 
 
@@ -726,10 +694,10 @@ public abstract class Parser {
                         exprs.add(operator(0));
                         match("]");
                     } while (isToken("["));
-                    Datatype data = new Datatype(Datatype.Name2Int(typ),dim,null,templates);
+                    Datatype data = new Datatype(Datatype.Name2Int(typ),dim,null);
                     var = getManager().getNewExpression(data, exprs);
                 } else {
-                    Datatype data = new Datatype(Datatype.Name2Int(typ),0,null,templates);
+                    Datatype data = new Datatype(Datatype.Name2Int(typ),0,null);
                     Class c = Class.getClassByName(data.getName());
                     LinkedList<Expression> parameter = new LinkedList<Expression>();
 
@@ -816,7 +784,7 @@ public abstract class Parser {
                     //schauen ob Variable
                     
                     Datatype curData = var.getDatatype();
-                    if (curData.match(new Datatype(curData,0,null,curData.getGenerics())) && curData.isClass()) {
+                    if (curData.match(new Datatype(curData,0,null)) && curData.isClass()) {
                         //okay, nun schauen ob es sich um eine methode oder attribut handelt.
                         Class c = Class.getClassByName(curData.getName());
                         boolean find = false;
@@ -843,7 +811,7 @@ public abstract class Parser {
                                         error("Cant access private method in non private scope.");
                                     }
                                     if (!func.isCompiled()) {
-                                        compileFunction(func, false);
+                                        compileFunction(func);
                                     }
                                     var = getManager().getMethodExpression(func.getDatatype(),var,c);
 
@@ -978,7 +946,7 @@ public abstract class Parser {
                     error("Variable cannot contain void datatype.");
                 }
                 
-                if (!var.getDatatype().match(expr.getDatatype())) {
+                if (!var.getDatatype().match(expr.getDatatype())) { //ist weil, variable einen generic hat, aber "new" eins ohne generic zurückgibt
                     error(var.getVariable().getDatatype().generateErrorMsg(expr.getDatatype()));
                 }
                 if (var instanceof ExpressionProperty);
@@ -1028,6 +996,7 @@ public abstract class Parser {
     /**
      * Parst einen Datentyp
      */
+    @SuppressWarnings("empty-statement")
     private Datatype datatype(boolean match,boolean funcDatatype,Datatype before) throws SyntaxException {
         LinkedList<Datatype> parameters = null;
         String name = "";
@@ -1072,18 +1041,25 @@ public abstract class Parser {
                 }
             }
         }
-        LinkedList<Datatype> generics = null;
+
         if (isToken("<")) {
+            Class c = Class.getClassByName(name);
+            name += "_templates_";
             match("<");
-            generics = new LinkedList<Datatype>();
             boolean start = false;
+            LinkedList<Datatype> data = new LinkedList<Datatype>();
             while (!isToken(">")) {
                 if (start) match(",");
-                generics.add(new Datatype(Datatype.Name2Int(getCurrent().getText()),0,null,null));
+                name += "_"+getCurrent().getText();
+                data.add(new Datatype(Datatype.Name2Int(getCurrent().getText()),0,null));
                 getNext();
                 start = true;
             }
             match(">");
+
+            if (c != null && Datatype.Name2Int(name) == -1) {
+                name = compileGenericClass(c, data);
+            }
         }
         int dim = 0;
         while (isToken("[")) {
@@ -1091,8 +1067,11 @@ public abstract class Parser {
             match("[");
             match("]");
         }
-
-        return new Datatype(Datatype.Name2Int(name),dim,parameters,generics);
+        int id =  Datatype.Name2Int(name);
+        if (id == -1) {
+            error("Unknown datatype name: '"+name+"'");
+        }
+        return new Datatype(id,dim,parameters);
     }
 
     private void overJumpBlock() throws SyntaxException {
@@ -1121,6 +1100,42 @@ public abstract class Parser {
             match("end");
         }
     }
+    /**
+     * kompiliert eine generische klasse, und zwar in den notwendigen datentyp
+     */
+    public String compileGenericClass(Class c, LinkedList<Datatype> data) throws SyntaxException {
+        String name = c.getName() + "_templates_";
+        for (Datatype d: data) {
+            name += "_"+d.toString();
+        }
+
+        //schauen ob es die klasse bereits gibt
+        boolean alreadyExist = false;
+        Class findClass = null;
+        for (Class testC: Class.getClasses()) {
+            if (name.equals(testC.getName())) {
+                //generics prüfen
+                findClass = testC;
+                alreadyExist = true;
+            }
+        }
+        if (!alreadyExist) {
+            Token tmp = getCurrent();
+            ListIterator tmp2 = iterator;
+            iterator = tokens.listIterator(tokens.indexOf( c.getStartToken() ));
+            getNext();
+            currentTemplates = data;
+            keyWord();
+            currentTemplates = null;
+
+            iterator = tmp2;
+            current = tmp;
+
+            return name;
+        } else {
+            return findClass.getName();
+        }
+     }
 
     /**
      * Schlüsselwort
@@ -1153,6 +1168,7 @@ public abstract class Parser {
                 Variable vari = new Variable(name, datatype);
                 if (inGenerator) {
                     currentClass.newAttribute(false, vari);
+                    vari.use();
                 } else {
                     getScope().newVariable(vari);
                 }
@@ -1182,8 +1198,8 @@ public abstract class Parser {
         } else if (isToken("if")) {
             match("if");
             Expression expr = operator(0);
-            if (!expr.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null))) {
-                error(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null).generateErrorMsg(expr.getDatatype()));
+            if (!expr.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
+                error(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null).generateErrorMsg(expr.getDatatype()));
             }
 
             ExpressionBlock block = block(false);
@@ -1192,8 +1208,8 @@ public abstract class Parser {
             while (isToken("elseif")) {
                 match("elseif");
                 Expression elseExpr = operator(0);
-                if (!elseExpr.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null))) {
-                    error(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null).generateErrorMsg(elseExpr.getDatatype()));
+                if (!elseExpr.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
+                    error(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null).generateErrorMsg(elseExpr.getDatatype()));
                 }
                 ExpressionBlock elseIfBlock = block(false);
                 //match("\n");
@@ -1262,6 +1278,8 @@ public abstract class Parser {
         } else if (isToken("loop")) {
             match("loop");
             Expression start= null;
+            boolean bef = inLoop;
+            inLoop = true;
             Token last = getCurrent();
             if (isToken("var")) {
                 noDoubleDeclaration = false;
@@ -1279,7 +1297,7 @@ public abstract class Parser {
                     match(",");
                     Expression inc = operator(0);
                     ExpressionBlock block = block(false);
-
+                    inLoop = bef;
                     return getManager().getForExpression(start, cond, inc, block);
                 } else if (isToken("to")) {
                     match("to");
@@ -1302,7 +1320,7 @@ public abstract class Parser {
                     //zurück
                     while (getNext() != tmp);
                     getNext();
-
+                    inLoop = bef;
                     //zusammensetzen
                     return getManager().getSimpleForExpression(var,start, to,step, block);
                 } else if (isToken("in")) {
@@ -1319,8 +1337,10 @@ public abstract class Parser {
                                     find ++;
                                     invFunc = func;
                                     func.use();
+
+                                    compileFunction(func);
                                 }
-                                if (func.getName().equals("hasnext") && func.getParameter().size() == 0 && func.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null))) {
+                                if (func.getName().equals("hasnext") && func.getParameter().size() == 0 && func.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
                                     find ++;
                                     func.use();
                                 }
@@ -1344,6 +1364,7 @@ public abstract class Parser {
                                 while (getNext() != tmp);
                                 //getNext();
                                 ExpressionBlock block = block(false);
+                                inLoop = bef;
                                 return getManager().getEachInExpression(c,block, var, in, start);
                             } else {
                                 error("Could not find 'invoke'.");
@@ -1356,10 +1377,11 @@ public abstract class Parser {
                     }
                 } else {
                     ExpressionBlock block = block(false);
+                    inLoop = bef;
                     return getManager().getWhileExpression(start, block);
                 }
             } else {
-                if (!start.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null))) {
+                if (!start.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
                     error("loop expression must be boolean.");
                 }
                 ExpressionBlock block = block(false);
@@ -1408,62 +1430,54 @@ public abstract class Parser {
             Token startToken = getCurrent();
             boolean baseClass = false;
             String name = "";
+            HashMap<String, String> tmpReplacer = replacer;
+            Class tmpClass = currentClass;
             replacer = null;
-            
+            Class c = null;
             if (isToken("<")) {
+                match("<");
+                boolean start = false;
+                LinkedList<String> types = new LinkedList<String>();
+                while (!isToken(">")) {
+                    if (start) match(",");
+                    types.add(getCurrent().getText());
+                    getNext();
+                }
+                match(">");
+                c = Class.getClassByName(getCurrent().getText());
                 //template
-                if (templates == null) {
-                    templates = new LinkedList<Datatype>();
+                if (currentTemplates == null) {
                     baseClass = true;
-                    match("<");
-                    boolean start = false;
-                    while (!isToken(">")) {
-                        if (start) match(",");
-                        String str = getCurrent().getText();
-                        getNext();
-                        Class c = new Class(str,null);
-                        Class.newClass(c);
-                        templates.add(c);
-                        start = true;
-                    }
-                    match(">");
                     name = getCurrent().getText();
                 } else {
-                    LinkedList<Datatype> d = new LinkedList<Datatype>();
-                    int i = 0;
-                    baseClass = false;
-                    match("<");
-                    boolean start = false;
                     replacer = new HashMap<String,String>();
-                    while (!isToken(">")) {
-                        if (start) match(",");
-                        String str = getCurrent().getText();
-                        getNext();
-                        replacer.put(str, templates.get(i).getName());
-                        //name+="_"+templates.get(i).getName();
-                        d.add(new Datatype(Datatype.Name2Int(templates.get(i).getName()),0,null,null));
-                        start = true;
+                    baseClass = false;
+                    int i = 0;
+                    for (String str: types) {
+                        replacer.put(str, currentTemplates.get(i).toString());
                         i++;
                     }
                     
-                    String n ="templates_";
-                    for (Datatype data: d) {
-                        n += data.toString();
+                    String n ="_templates_";
+                    for (String data: replacer.values()) {
+                        n += "_"+data;
                     }
-                    match(">");
-                    name = getCurrent().getText()+"_"+n;
+                    
+
+
+                    name = getCurrent().getText()+n;
+
                     Class.newClass(new Class(name,startToken));
                 }
             } else {
                 name = getCurrent().getText();
-                templates = null;
             }
             //name = getCurrent().getText() + name;
-            Class c = Class.getClassByName(name);
+            c = Class.getClassByName(name);
             if (!baseClass) {
                 c.setReplacer(replacer);
             }
-            if (templates != null && templates.size()>0) c.setGenerics(templates);
+
             currentClass = c;
             classes.add(c);
             getNext();
@@ -1542,14 +1556,19 @@ public abstract class Parser {
                             c.newMethod(isPublic, get, thisVar, superVar);
                             getMainScope().newFunction(get);
 
-                            compileFunction(get,false);
+                            compileFunction(get);
+
+                            if (get.getDatatype() != null) {
+                                data = get.getDatatype();
+                            }
+
                             overJumpBlock();
                         } else if (isToken("set")) {
                             match("set");
 
                             if (set != null) error("Duplicate set property.");
 
-                            set = new CodeFunction("set_"+propName,new Datatype(Datatype.VOID_DATATYPE,0,null,null),new Scope("",this,null));
+                            set = new CodeFunction("set_"+propName,new Datatype(Datatype.VOID_DATATYPE,0,null),new Scope("",this,null));
                             Variable v = set.newParameter("value", null);
                             set.setStartToken(getCurrent());
                             set.setTyp(CodeFunction.IS_PROPERTY_SET);
@@ -1557,7 +1576,7 @@ public abstract class Parser {
                             c.newMethod(isPublic, set, thisVar, superVar);
                             getMainScope().newFunction(set);
 
-                            compileFunction(set,false);
+                            compileFunction(set);
                             overJumpBlock();
 
                             if (data == null) data = v.getDatatype();
@@ -1574,7 +1593,7 @@ public abstract class Parser {
                     match("generator");
                     if (gen) error("Class can only have maximal one generator.");
                     gen = true;
-                    Variable v = new Variable("status",new Datatype(Datatype.INT_DATATYPE,0,null,null));
+                    Variable v = new Variable("status",new Datatype(Datatype.INT_DATATYPE,0,null));
                     v.use();
                     c.newAttribute(false, v);
                     LinkedList<Variable> tmpVar = new LinkedList<Variable>();
@@ -1586,7 +1605,7 @@ public abstract class Parser {
 
 
                     Scope s = new Scope("",this,null);
-                    CodeFunction func = new CodeFunction("start",new Datatype(Datatype.VOID_DATATYPE,0,null,null),s);
+                    CodeFunction func = new CodeFunction("start",new Datatype(Datatype.VOID_DATATYPE,0,null),s);
                     ExpressionBlock block = getManager().getBlockExpression(false);
                     block.addLine(getManager().getAssignmentExpression(v, getManager().getAccessExpression(getManager().getVariableExpression(thisVar), getManager().getVariableExpression(v)), getManager().getIntegerExpression(0)));
                     func.setBlock(block);
@@ -1596,7 +1615,7 @@ public abstract class Parser {
 
 
                     s = new Scope("",this,null);
-                    func = new CodeFunction("hasnext",new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null),s);
+                    func = new CodeFunction("hasnext",new Datatype(Datatype.BOOLEAN_DATATYPE,0,null),s);
                     block = getManager().getBlockExpression(false);
                     Operator o = null;
                     for (Operator op: operators) {
@@ -1616,7 +1635,7 @@ public abstract class Parser {
                     s = new Scope("",this,null);
                     s.setClass(c);
                     func= new CodeFunction("invoke",data,s);
-
+                    func.setAsGenerator();
                     func.use();
                     match("(");
                     boolean start = false;
@@ -1637,26 +1656,15 @@ public abstract class Parser {
                     match(")");
                     func.setStartToken(getCurrent());
                     c.newMethod(isPublic, func,thisVar,superVar);
-                    
-                    inGenerator = true;
-                    currentFunction = func;
-                    
-                    compileFunction(func,true);
-
-                    overJumpBlock();
-                    currentFunction = null;
-                    inGenerator = false;
-
-                    
-                    
-
-                    funcDecs.add(getManager().getFunctionDeclarationExpression(block, func));
-
                     getMainScope().newFunction(func);
                     func.notCallable();
+
+                    
+                    overJumpBlock();
+                    
                 } else if (isToken("function")) {
                     Expression expr = keyWord();
-                    
+                    //getMainScope().getFunctions().removeLast();
 
                     expr.setLine(getCurrent().getLine());
                     
@@ -1669,7 +1677,7 @@ public abstract class Parser {
                     lastFunc.setName(tmpName);
 
                 } else {
-                    error("Expecting var or function");
+                    error("Expecting var, function, generator or property.");
                 }
                 match("\n");
                 while (isToken("\n")) getNext();
@@ -1679,15 +1687,9 @@ public abstract class Parser {
                 match("end");
                 match("\n");
             }
-            currentClass = null;
-            replacer = null;
-
-            if (baseClass && templates != null) {
-                for (Datatype data: templates) {
-                    data.remove();
-                }
-            }
-            templates = null;
+            currentClass = tmpClass;
+            replacer = tmpReplacer;
+            
             return getManager().getEmptyExpression();
         } else if (isToken("function")) {
             match("function");
@@ -1710,7 +1712,7 @@ public abstract class Parser {
                 if (isToken(":")) {
                     error("Constructor has no datatype.");
                 }
-                data = new Datatype(currentClass,0,null,null);
+                data = new Datatype(currentClass,0,null);
             } else {
                 if (isToken(":")) data = datatype(true,true);
             }
@@ -1761,7 +1763,7 @@ public abstract class Parser {
             if (currentClass == null && !anonymous) getMainScope().newFunction(func);
             if (anonymous) {
                 getMainScope().getFunctions().add(func);
-                compileFunction(func,false);
+                compileFunction(func);
                 return getManager().getAnonymousFuncExpression((CodeFunction)func);
             } else {
                 return getManager().getEmptyExpression();

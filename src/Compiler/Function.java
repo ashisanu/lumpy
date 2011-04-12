@@ -52,7 +52,7 @@ public class Function extends Variable {
             for (Expression par:parameters) {
                 Datatype data = this.parameters.get(i).getDatatype();
                 
-                if (par.getDatatype() != null && !par.getDatatype().match(data)) {
+                if (par.getDatatype() != null && !par.getDatatype().match(data) && !(data.isClass() && par.getDatatype().isNull())) {
                     return false;
                 }
                 i++;

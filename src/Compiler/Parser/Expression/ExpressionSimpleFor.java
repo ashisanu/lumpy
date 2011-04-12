@@ -21,7 +21,7 @@ public abstract class ExpressionSimpleFor extends Expression {
      * @param increment
      */
     public ExpressionSimpleFor(Parser p,ExpressionIdentifier var, Expression init, Expression cond, Expression increment,ExpressionBlock block) {
-        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.init = init;
         this.cond = cond;
         this.increment = increment;

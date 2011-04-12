@@ -28,7 +28,7 @@ public abstract class ExpressionAnonymousFunc extends ExpressionIdentifier {
         for (Variable par: func.getParameter()) {
             params.add(par.getDatatype());
         }
-        return new Datatype(func.getDatatype(),func.getDatatype().getDimensions(),params,func.getDatatype().getGenerics());
+        return new Datatype(func.getDatatype(),func.getDatatype().getDimensions(),params);
     }
 
 

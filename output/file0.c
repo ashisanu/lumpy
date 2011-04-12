@@ -48,114 +48,97 @@ GCNode* new_node() {
 	return obj;
 	
 }
-GCNode* cast2list_templates_int(GCNode* node) {
-	node -> typid = TYP_LIST_TEMPLATES_INT;
+GCNode* cast2list_templates__int(GCNode* node) {
+	node -> typid = TYP_LIST_TEMPLATES__INT;
 	return node;
 	
 }
-GCNode* new_list_templates_int() {
-	GCNode* obj = gc_malloc(sizeof(list_templates_int), &standardTrace);
-	((list_templates_int*)obj -> data) -> typid = TYP_LIST_TEMPLATES_INT;
-	obj -> typid = TYP_LIST_TEMPLATES_INT;
-	((list_templates_int*)obj -> data) -> _head_ = NULL;
+GCNode* new_list_templates__int() {
+	GCNode* obj = gc_malloc(sizeof(list_templates__int), &standardTrace);
+	((list_templates__int*)obj -> data) -> typid = TYP_LIST_TEMPLATES__INT;
+	obj -> typid = TYP_LIST_TEMPLATES__INT;
+	((list_templates__int*)obj -> data) -> _head_ = NULL;
+	((list_templates__int*)obj -> data) -> _status_ = ((int)-1);
 	return obj;
 	
 }
-GCNode* cast2node_templates_int(GCNode* node) {
-	node -> typid = TYP_NODE_TEMPLATES_INT;
+GCNode* cast2node_templates__int(GCNode* node) {
+	node -> typid = TYP_NODE_TEMPLATES__INT;
 	return node;
 	
 }
-GCNode* new_node_templates_int() {
-	GCNode* obj = gc_malloc(sizeof(node_templates_int), &standardTrace);
-	((node_templates_int*)obj -> data) -> typid = TYP_NODE_TEMPLATES_INT;
-	obj -> typid = TYP_NODE_TEMPLATES_INT;
-	((node_templates_int*)obj -> data) -> _prev_ = NULL;
-	((node_templates_int*)obj -> data) -> __value_ = ((int)0);
+GCNode* new_node_templates__int() {
+	GCNode* obj = gc_malloc(sizeof(node_templates__int), &standardTrace);
+	((node_templates__int*)obj -> data) -> typid = TYP_NODE_TEMPLATES__INT;
+	obj -> typid = TYP_NODE_TEMPLATES__INT;
+	((node_templates__int*)obj -> data) -> _prev_ = NULL;
+	((node_templates__int*)obj -> data) -> __value_ = ((int)0);
 	return obj;
 	
 }
 void function_program() {
-	stack_enter(1);
+	stack_enter(2);
 	
-	//Line: 40
-	GCNode* _list_ = list_templates_int_new (new_list_templates_int() );
+	//Line: 49
+	GCNode* _list_ = list_templates__int_new (new_list_templates__int() );
 	stack_create(&_list_, 0);
 	;
-	//Line: 41
-	list_templates_int_add (_list_, ((int)10) );
-	//Line: 42
-	list_templates_int_add (_list_, ((int)23) );
-	//Line: 43
-	list_templates_int_add (_list_, ((int)900) );
+	//Line: 50
+	list_templates__int_add (_list_, ((int)10) );
+	//Line: 51
+	list_templates__int_add (_list_, ((int)23) );
+	//Line: 52
+	list_templates__int_add (_list_, ((int)900) );
+	//Line: 53
+	print_string (newString("ok") );
+	//Line: 54
+	int _j_ = ((int)0);
+	;
+	//Line: 55
+	int _i_ = ((int)0);
+	;
+	list_templates__int_start(_list_);
+	_i_ = list_templates__int_invoke(_list_);
+	while (list_templates__int_hasnext(_list_)) {
+		{
+			//Line: 56
+			print_int (_i_ );
+			//Line: 57
+			_j_ = (_j_ + ((int)1));
+			//Line: 58
+			if ((_j_ > ((int)10))) {
+				//Line: 59
+				break;
+				;
+				
+			};
+			
+		}
+	_i_ = list_templates__int_invoke(_list_);
+	}
+	;
 	stack_leave();
 	return;
 	stack_leave();
 	
 }
-GCNode* list_templates_int_new(GCNode* _this_) {
+int node_templates__int_get_value(GCNode* _this_) {
 	GCNode* _super_ = NULL;
 	int tmpid = _this_ -> typid;
 	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
 	switch (tmpid) {
-		case TYP_LIST_TEMPLATES_INT: 
+		case TYP_NODE_TEMPLATES__INT: 
 			{
-				return _this_;
-				
-			}
-			break;
-		default:
-			{
-				return _this_;
-				
-			}
-			
-	}
-	return;
-	
-}
-void list_templates_int_add(GCNode* _this_, int _param_0_) {
-	GCNode* _super_ = NULL;
-	int tmpid = _this_ -> typid;
-	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
-	switch (tmpid) {
-		case TYP_LIST_TEMPLATES_INT: 
-			{
-				//Line: 12
-				node_templates_int_new (new_node_templates_int(), (((list_templates_int*)_this_ -> data) -> _head_), _param_0_ );
-				return;
-				
-			}
-			break;
-		default:
-			{
-				//Line: 12
-				node_templates_int_new (new_node_templates_int(), (((list_templates_int*)_this_ -> data) -> _head_), _param_0_ );
-				return;
-				
-			}
-			
-	}
-	return;
-	
-}
-int node_templates_int_get_value(GCNode* _this_) {
-	GCNode* _super_ = NULL;
-	int tmpid = _this_ -> typid;
-	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
-	switch (tmpid) {
-		case TYP_NODE_TEMPLATES_INT: 
-			{
-				//Line: 22
-				return (((node_templates_int*)_this_ -> data) -> __value_);
+				//Line: 31
+				return (((node_templates__int*)_this_ -> data) -> __value_);
 				return ((int)0);
 				
 			}
 			break;
 		default:
 			{
-				//Line: 22
-				return (((node_templates_int*)_this_ -> data) -> __value_);
+				//Line: 31
+				return (((node_templates__int*)_this_ -> data) -> __value_);
 				return ((int)0);
 				
 			}
@@ -164,23 +147,23 @@ int node_templates_int_get_value(GCNode* _this_) {
 	return;
 	
 }
-GCNode* node_templates_int_get_previous(GCNode* _this_) {
+GCNode* node_templates__int_get_previous(GCNode* _this_) {
 	GCNode* _super_ = NULL;
 	int tmpid = _this_ -> typid;
 	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
 	switch (tmpid) {
-		case TYP_NODE_TEMPLATES_INT: 
+		case TYP_NODE_TEMPLATES__INT: 
 			{
-				//Line: 28
-				return (((node_templates_int*)_this_ -> data) -> _prev_);
+				//Line: 37
+				return (((node_templates__int*)_this_ -> data) -> _prev_);
 				return NULL;
 				
 			}
 			break;
 		default:
 			{
-				//Line: 28
-				return (((node_templates_int*)_this_ -> data) -> _prev_);
+				//Line: 37
+				return (((node_templates__int*)_this_ -> data) -> _prev_);
 				return NULL;
 				
 			}
@@ -189,20 +172,20 @@ GCNode* node_templates_int_get_previous(GCNode* _this_) {
 	return;
 	
 }
-GCNode* node_templates_int_new(GCNode* _this_, GCNode* _param_0_, int _param_1_) {
+GCNode* node_templates__int_new(GCNode* _this_, GCNode* _param_0_, int _param_1_) {
 	GCNode* _super_ = NULL;
 	int tmpid = _this_ -> typid;
 	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
 	switch (tmpid) {
-		case TYP_NODE_TEMPLATES_INT: 
+		case TYP_NODE_TEMPLATES__INT: 
 			{
 				stack_enter(1);
 				
 				stack_create(&_param_0_, 0);
-				//Line: 33
-				(((node_templates_int*)_this_ -> data) -> _prev_) = _param_0_;
-				//Line: 34
-				(((node_templates_int*)_this_ -> data) -> __value_) = _param_1_;
+				//Line: 42
+				(((node_templates__int*)_this_ -> data) -> _prev_) = _param_0_;
+				//Line: 43
+				(((node_templates__int*)_this_ -> data) -> __value_) = _param_1_;
 				stack_leave();
 				return _this_;
 				stack_leave();
@@ -214,13 +197,172 @@ GCNode* node_templates_int_new(GCNode* _this_, GCNode* _param_0_, int _param_1_)
 				stack_enter(1);
 				
 				stack_create(&_param_0_, 0);
-				//Line: 33
-				(((node_templates_int*)_this_ -> data) -> _prev_) = _param_0_;
-				//Line: 34
-				(((node_templates_int*)_this_ -> data) -> __value_) = _param_1_;
+				//Line: 42
+				(((node_templates__int*)_this_ -> data) -> _prev_) = _param_0_;
+				//Line: 43
+				(((node_templates__int*)_this_ -> data) -> __value_) = _param_1_;
 				stack_leave();
 				return _this_;
 				stack_leave();
+				
+			}
+			
+	}
+	return;
+	
+}
+GCNode* list_templates__int_new(GCNode* _this_) {
+	GCNode* _super_ = NULL;
+	int tmpid = _this_ -> typid;
+	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
+	switch (tmpid) {
+		case TYP_LIST_TEMPLATES__INT: 
+			{
+				return _this_;
+				
+			}
+			break;
+		default:
+			{
+				return _this_;
+				
+			}
+			
+	}
+	return;
+	
+}
+void list_templates__int_add(GCNode* _this_, int _param_0_) {
+	GCNode* _super_ = NULL;
+	int tmpid = _this_ -> typid;
+	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
+	switch (tmpid) {
+		case TYP_LIST_TEMPLATES__INT: 
+			{
+				//Line: 12
+				(((list_templates__int*)_this_ -> data) -> _head_) = node_templates__int_new (new_node_templates__int(), (((list_templates__int*)_this_ -> data) -> _head_), _param_0_ );
+				return;
+				
+			}
+			break;
+		default:
+			{
+				//Line: 12
+				(((list_templates__int*)_this_ -> data) -> _head_) = node_templates__int_new (new_node_templates__int(), (((list_templates__int*)_this_ -> data) -> _head_), _param_0_ );
+				return;
+				
+			}
+			
+	}
+	return;
+	
+}
+void list_templates__int_start(GCNode* _this_) {
+	GCNode* _super_ = NULL;
+	int tmpid = _this_ -> typid;
+	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
+	switch (tmpid) {
+		case TYP_LIST_TEMPLATES__INT: 
+			{
+				(((list_templates__int*)_this_ -> data) -> _status_) = ((int)0);
+				
+			}
+			break;
+		default:
+			{
+				(((list_templates__int*)_this_ -> data) -> _status_) = ((int)0);
+				
+			}
+			
+	}
+	return;
+	
+}
+boolean list_templates__int_hasnext(GCNode* _this_) {
+	GCNode* _super_ = NULL;
+	int tmpid = _this_ -> typid;
+	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
+	switch (tmpid) {
+		case TYP_LIST_TEMPLATES__INT: 
+			{
+				return ((((list_templates__int*)_this_ -> data) -> _status_) != ((int)-1));
+				
+			}
+			break;
+		default:
+			{
+				return ((((list_templates__int*)_this_ -> data) -> _status_) != ((int)-1));
+				
+			}
+			
+	}
+	return;
+	
+}
+int list_templates__int_invoke(GCNode* _this_) {
+	GCNode* _super_ = NULL;
+	int tmpid = _this_ -> typid;
+	_this_ -> typid = ((object*)_this_->data) -> typid; //grauslicher hack fuers casten...
+	switch (tmpid) {
+		case TYP_LIST_TEMPLATES__INT: 
+			{
+				switch (((list_templates__int*)_this_ -> data) -> _status_) {
+					case 0:
+					//Line: 16
+					((list_templates__int*)_this_ -> data) ->_tmp_ = (((list_templates__int*)_this_ -> data) -> _head_);
+					;
+					//Line: 17
+					while (((((list_templates__int*)_this_ -> data) -> _tmp_) != NULL)) {
+						//Line: 18
+						((list_templates__int*)_this_ -> data) -> _status_ = 1;
+						return node_templates__int_get_value((((list_templates__int*)_this_ -> data) -> _tmp_));
+						case 1:
+						;
+						//Line: 19
+						(((list_templates__int*)_this_ -> data) -> _tmp_) = node_templates__int_get_previous((((list_templates__int*)_this_ -> data) -> _tmp_));
+						
+					};
+					//Line: 21
+					((list_templates__int*)_this_ -> data) -> _status_ = -1;
+					stack_leave();
+					return 0;
+					case 2:
+					;
+					return ((int)0);
+					
+				}
+				((list_templates__int*)_this_ -> data) -> _status_ = -1;
+				
+			}
+			break;
+		default:
+			{
+				switch (((list_templates__int*)_this_ -> data) -> _status_) {
+					case 0:
+					//Line: 16
+					((list_templates__int*)_this_ -> data) ->_tmp_ = (((list_templates__int*)_this_ -> data) -> _head_);
+					;
+					//Line: 17
+					while (((((list_templates__int*)_this_ -> data) -> _tmp_) != NULL)) {
+						//Line: 18
+						((list_templates__int*)_this_ -> data) -> _status_ = 1;
+						return node_templates__int_get_value((((list_templates__int*)_this_ -> data) -> _tmp_));
+						case 1:
+						;
+						//Line: 19
+						(((list_templates__int*)_this_ -> data) -> _tmp_) = node_templates__int_get_previous((((list_templates__int*)_this_ -> data) -> _tmp_));
+						
+					};
+					//Line: 21
+					((list_templates__int*)_this_ -> data) -> _status_ = -1;
+					stack_leave();
+					return 0;
+					case 2:
+					;
+					return ((int)0);
+					
+				}
+				((list_templates__int*)_this_ -> data) -> _status_ = -1;
 				
 			}
 			

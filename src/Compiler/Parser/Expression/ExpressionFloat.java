@@ -16,7 +16,7 @@ public abstract class ExpressionFloat extends Expression {
      * @param num
      */
     public ExpressionFloat(Parser p, float num) {
-        super(p,new Datatype(Datatype.FLOAT_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.FLOAT_DATATYPE,0,null));
 
         this.number = num;
     }

@@ -12,7 +12,7 @@ public class ExpressionEmpty extends Expression {
      * Konstruktor
      */
     public ExpressionEmpty(Parser p) {
-        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null));
     }
     /**
      * generiert

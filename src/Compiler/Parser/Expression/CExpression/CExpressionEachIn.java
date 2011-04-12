@@ -32,7 +32,7 @@ public class CExpressionEachIn extends ExpressionEachIn {
             if (func.getName().equals("invoke") && func.getParameter().size() == 0) {
                 invokeFunc = func;
             }
-            if (func.getName().equals("hasnext") && func.getParameter().size() == 0 && func.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null))) {
+            if (func.getName().equals("hasnext") && func.getParameter().size() == 0 && func.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
                 hasNextFunc = func;
             }
             if (func.getName().equals("start") && func.getParameter().size() == 0) {

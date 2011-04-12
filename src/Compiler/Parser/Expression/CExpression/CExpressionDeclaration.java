@@ -44,7 +44,7 @@ public class CExpressionDeclaration extends ExpressionDeclaration {
                     str += " = "+var.getDatatype().createDatatypeExpression(getParser().getManager()).generate();
                 }
                 str+=";"+getParser().newLine();
-                if (var.getDatatype().isGC()) {
+                if (var.getDatatype().isGC() && !inGenerator) {
                     str += "stack_create(&"+CExpressionAssignment.getAccess(var)+", "+decVar+");"+getParser().newLine();
                     decVar++;
                     

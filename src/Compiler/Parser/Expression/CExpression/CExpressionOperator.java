@@ -18,7 +18,7 @@ public class CExpressionOperator extends ExpressionOperator {
     public String generate() {
         try {
             String str = "";
-            if (getLeft().getDatatype().match(new Datatype(Datatype.STRING_DATATYPE,0,null,null)) || getRight().getDatatype().match(new Datatype(Datatype.STRING_DATATYPE,0,null,null))) {
+            if (getLeft().getDatatype().match(new Datatype(Datatype.STRING_DATATYPE,0,null)) || getRight().getDatatype().match(new Datatype(Datatype.STRING_DATATYPE,0,null)) && !getLeft().getDatatype().isNull() && !getRight().getDatatype().isNull()) {
                 str += "joinstr(";
                 str += getLeft().generate()+", ";
                 str += getRight().generate()+")";

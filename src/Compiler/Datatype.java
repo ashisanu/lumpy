@@ -54,7 +54,7 @@ public class Datatype {
     protected int dimensions;
     protected int id;
     protected LinkedList<Datatype> parameters;
-    protected LinkedList<Datatype> generics;
+
 
     public static int Name2Int(String name) {
         if (name.equals("int"))
@@ -93,8 +93,8 @@ public class Datatype {
         }
         return -1;
     }
-    public Datatype(Datatype data,int dimensions,LinkedList<Datatype> parameters,LinkedList<Datatype> generics) {
-        this(data.getID(),dimensions,parameters,generics);
+    public Datatype(Datatype data,int dimensions,LinkedList<Datatype> parameters) {
+        this(data.getID(),dimensions,parameters);
     }
     /**
      * Konsturktor
@@ -102,11 +102,11 @@ public class Datatype {
      * @param dimensions Anzahl der Dimensionen
      * @param parameters Datentypen der Parameter
      */
-    public Datatype(int id,int dimensions,LinkedList<Datatype> parameters,LinkedList<Datatype> generics) {
+    public Datatype(int id,int dimensions,LinkedList<Datatype> parameters) {
         this.id = id;
         this.dimensions = dimensions;
         this.parameters = parameters;
-        this.generics = generics;
+
         if (this.dimensions == -1) this.dimensions = 0;
         switch(id) {
             case INT_DATATYPE:
@@ -146,12 +146,7 @@ public class Datatype {
             }
         }
     }
-    /**
-     * löscht alle bekannten referenzen
-     */
-    public void remove() {
-        Datatype.getClasses().remove(this);
-    }
+
     /**
      * Der Name des Datentyps
      * @return der Name
@@ -179,11 +174,7 @@ public class Datatype {
             for (Datatype data:getParameters())
                 str += "_"+data.toString()+"_";
         }
-        if (getGenerics() != null) {
-            //str += "_templates_";
-            //for (Datatype data:getGenerics())
-            //    str += "_"+data.toString()+"_";
-        }
+
         return str;
     }
 
@@ -201,20 +192,6 @@ public class Datatype {
             return true;
         }
 
-        if (this.getGenerics() != null && data.getGenerics() != null) {
-            //nun müssen die parameter übereinstimmen
-            if (this.getGenerics().size() == data.getGenerics().size()) {
-                for (int i = 0;i<data.getGenerics().size();i++) {
-                    if (!this.getGenerics().get(i).match(data.getGenerics().get(i))) {
-                        return false;
-                    }
-                }
-            } else {
-                return false;
-            }
-        } else if (this.getGenerics() != null || data.getGenerics() != null) {
-            return false;
-        }
 
         if (this.getParameters() != null && data.getParameters() != null) {
             //nun müssen die parameter übereinstimmen
@@ -287,12 +264,7 @@ public class Datatype {
         return this.parameters;
     }
 
-    /**
-     * Generic
-     */
-    public LinkedList<Datatype> getGenerics() {
-        return generics;
-    }
+
 
     /**
      * Ist es eine Klasse?
