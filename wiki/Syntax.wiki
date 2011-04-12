@@ -117,12 +117,12 @@ end
 
 == property: ==
 {{{
-public property var
+public property testVariable
    get
-      return this._var
+      return this._vari
    end
    set
-      this._var = var
+      this._vari = value
    end
 end
 }}}
