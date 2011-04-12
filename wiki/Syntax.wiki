@@ -153,7 +153,7 @@ end
 {{{
 class containerClass
     public generator:int(start:int)
-        for var i = start to start + 10
+        loop var i = start to start + 10
             yield return i
         end
         yield break //optional
@@ -167,7 +167,7 @@ function program()
         print gen.invoke(10)
     end
     //or:
-    for var i in gen
+    loop var i in gen
         print i
     end
 end
