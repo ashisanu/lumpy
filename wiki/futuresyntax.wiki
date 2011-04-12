@@ -76,13 +76,6 @@ function program()
 end
 }}}
 
-== function template ==
-{{{
-function<Datatype> add:datatype(left:datatype,right:datatype)
-    return left + right
-end
-}}}
-
 == meta functions (operator overloading) ==
 Overloadable operators:
 +,-,*,/,and,or,not,<,>,<=,>=,!=
