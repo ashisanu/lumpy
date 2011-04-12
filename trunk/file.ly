@@ -10,6 +10,15 @@ class<datatype> list
 	public function add(v:datatype)
 		this.head = new node<datatype>(this.head, v)
 	end
+	
+	public generator:datatype()
+		var tmp = this.head
+		loop tmp != null
+			yield return tmp.value
+			tmp = tmp.previous
+		end
+		yield break
+	end
 end
 
 class<datatype> node
@@ -40,7 +49,14 @@ function program()
 	list.add 10
 	list.add 23
 	list.add 900
-	
-	
+	print "ok"
+	var j = 0
+	loop var i in list
+		print i
+		j = j + 1
+		if j > 10
+			exit
+		end
+	end
 end
 

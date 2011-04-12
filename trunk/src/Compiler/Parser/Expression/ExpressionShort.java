@@ -16,7 +16,7 @@ public abstract class ExpressionShort extends Expression {
      * @param num
      */
     public ExpressionShort(Parser p, short num) {
-        super(p,new Datatype(Datatype.SHORT_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.SHORT_DATATYPE,0,null));
 
         this.number = num;
     }

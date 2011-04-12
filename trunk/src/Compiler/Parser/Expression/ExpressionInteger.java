@@ -17,7 +17,7 @@ public abstract class ExpressionInteger extends Expression {
      * @param num
      */
     public ExpressionInteger(Parser p, int num) {
-        super(p,new Datatype(Datatype.INT_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.INT_DATATYPE,0,null));
         
         this.number = num;
     }

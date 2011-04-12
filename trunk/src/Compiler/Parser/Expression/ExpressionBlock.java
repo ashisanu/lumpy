@@ -22,7 +22,7 @@ public abstract class ExpressionBlock extends Expression {
      * Konstruktor für den Block
      */
     public ExpressionBlock(Parser p,boolean gen) {
-        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null));
         lines = new LinkedList<Expression>();
         variables = new LinkedList<Variable>();
         this.inGenerator = gen;

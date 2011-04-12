@@ -1,5 +1,11 @@
 Lumpy - Automatisch typisierte Sprache, case insensitiv, OOP, Zielplatformen: C, Java und JavaScript
 
+Der Name Lumpy: Lumpy ist oft ein "Nickname" in vielen Filmen. So, soll Lumpy lediglich ein Nickname sein, 
+für die verschiedenen Sprachen als Output.
+
+
+Lum personal you
+
 Typableitung:
 Es gibt zwei Möglichkeiten wie sich der Datentyp automatisch vorhersagen lässt:
 Set:

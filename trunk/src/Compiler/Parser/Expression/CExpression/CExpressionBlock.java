@@ -21,6 +21,7 @@ public class CExpressionBlock extends ExpressionBlock {
         c = p.getCurrentClass();
     }
 
+
     @Override
     public String generate() {
         int tmp = CExpressionBlock.varCount;
@@ -30,11 +31,15 @@ public class CExpressionBlock extends ExpressionBlock {
         varCount = 0;
         for (Variable var: variables) {
             if (var.isUsed() && (var.getDatatype().isGC())) {
-                varCount ++;
-                str += "stack_create(&"+CExpressionAssignment.getAccess(var)+", "+CExpressionDeclaration.decVar+");"+getParser().newLine();
-                CExpressionDeclaration.decVar++;
+                if (!inGenerator) {
+                    varCount ++;
+                    str += "stack_create(&"+CExpressionAssignment.getAccess(var)+", "+CExpressionDeclaration.decVar+");"+getParser().newLine();
+                    CExpressionDeclaration.decVar++;
+                }
             }
         }
+        
+        
         int tmpC = yieldRetCounter;
         String tmpV = varAcc;
         if (inGenerator) {
@@ -50,7 +55,9 @@ public class CExpressionBlock extends ExpressionBlock {
             if (expr.getLine() != -1) str += "//Line: "+expr.getLine()+getParser().newLine();
             if (expr instanceof ExpressionDeclaration) {
                 for (Variable var: ((ExpressionDeclaration)expr).getDecVar()) {
-                    if (var.isUsed()) varCount ++;
+                    if (var.isUsed() && !inGenerator) {
+                        varCount ++;
+                    }
                 }
             }
             str += expr.generate()+";"+getParser().newLine();
@@ -63,6 +70,7 @@ public class CExpressionBlock extends ExpressionBlock {
             str += varAcc + " = -1;"+getParser().newLine();
             yieldRetCounter = tmpC;
             varAcc = tmpV;
+            varCount = 0;
         }
         
 

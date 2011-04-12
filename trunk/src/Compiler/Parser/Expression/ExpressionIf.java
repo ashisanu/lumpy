@@ -21,7 +21,7 @@ public abstract class ExpressionIf extends Expression {
      * @param elseifs die elseifs
      */
     public ExpressionIf(Parser p, Expression fork, ExpressionBlock block, ExpressionBlock elseBlock, LinkedList<ExpressionIf> elseifs) {
-        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.fork = fork;
         this.block = block;
         this.elseBlock = elseBlock;

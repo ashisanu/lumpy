@@ -21,7 +21,7 @@ public class CExpressionArray extends ExpressionArray {
     public String generate() {
         try {
             String str = "";
-            Datatype d = new Datatype(var.getDatatype(),arrs.size(),null,null);
+            Datatype d = new Datatype(var.getDatatype(),arrs.size(),null);
             str += "(("+CExpressionAssignment.getArrayDatatype(d)+"*)("+var.generate()+" -> data))";
             for (Expression e: arrs) {
                 str += "["+e.generate()+"]";

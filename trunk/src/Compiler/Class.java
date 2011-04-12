@@ -24,7 +24,7 @@ public class Class extends Datatype {
      * @param name
      */
     public Class(String name, Token tok) {
-        super(classID++,0,null,null);
+        super(classID++,0,null);
         this.attribute = new LinkedList<Variable>();
         this.methods = new LinkedList<Function>();
         this.startDecs = new LinkedList<ExpressionDeclaration>();
@@ -161,13 +161,6 @@ public class Class extends Datatype {
      */
     public LinkedList<Class> getInheriting() {
         return inheriting;
-    }
-
-    /**
-     * Setzt die Templates
-     */
-    public void setGenerics(LinkedList<Datatype> gens) {
-        this.generics = gens;
     }
 
     /**

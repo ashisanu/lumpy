@@ -14,7 +14,7 @@ public class CodeFunction extends Function {
     public static final int IS_PROPERTY_SET = 1004;
     public static final int IS_PROPERTY_GET = 1005;
 
-
+    private boolean isGen = false;;
     private Token token;
     private Scope scope;
     private ExpressionBlock block;
@@ -74,5 +74,19 @@ public class CodeFunction extends Function {
      */
     public int getTyp() {
         return typ;
+    }
+
+    /**
+     * setzt es als Generator
+     */
+    public void setAsGenerator() {
+        this.isGen = true;
+    }
+
+    /**
+     * ists ein generator
+     */
+    public boolean isGenerator() {
+        return isGen;
     }
 }

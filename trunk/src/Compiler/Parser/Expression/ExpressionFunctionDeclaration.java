@@ -13,7 +13,7 @@ public abstract class ExpressionFunctionDeclaration extends Expression {
     
 
     public ExpressionFunctionDeclaration(Parser p, ExpressionBlock block, CodeFunction func) {
-        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p, new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.block = block;
         this.func = func;
     }

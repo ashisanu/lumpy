@@ -16,7 +16,7 @@ public abstract class ExpressionByte extends Expression {
      * @param num
      */
     public ExpressionByte(Parser p, byte num) {
-        super(p,new Datatype(Datatype.BYTE_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.BYTE_DATATYPE,0,null));
 
         this.number = num;
     }

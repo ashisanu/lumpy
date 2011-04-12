@@ -9,6 +9,6 @@ import Compiler.Parser.Parser;
  */
 public abstract class ExpressionNull extends Expression {
     public ExpressionNull(Parser p) {
-        super(p,new Datatype(Datatype.NULL_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.NULL_DATATYPE,0,null));
     }
 }

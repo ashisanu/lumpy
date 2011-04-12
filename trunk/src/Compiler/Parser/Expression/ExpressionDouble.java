@@ -17,7 +17,7 @@ public abstract class ExpressionDouble extends Expression {
      * @param num
      */
     public ExpressionDouble(Parser p, double num) {
-        super(p,new Datatype(Datatype.DOUBLE_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.DOUBLE_DATATYPE,0,null));
 
         this.number = num;
     }

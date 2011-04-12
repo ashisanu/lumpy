@@ -23,7 +23,7 @@ public abstract class ExpressionArray extends ExpressionIdentifier {
     }
     @Override
     public Datatype getDatatype() throws SyntaxException {
-        Datatype data = new Datatype(super.getDatatype(),super.getDatatype().getDimensions() - arrs.size(),super.getDatatype().getParameters(),super.getDatatype().getGenerics());
+        Datatype data = new Datatype(super.getDatatype(),super.getDatatype().getDimensions() - arrs.size(),super.getDatatype().getParameters());
         
         return data;
     }

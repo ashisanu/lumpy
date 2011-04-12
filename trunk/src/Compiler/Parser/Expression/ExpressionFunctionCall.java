@@ -21,7 +21,7 @@ public abstract class ExpressionFunctionCall extends ExpressionIdentifier {
      */
     public ExpressionFunctionCall(Parser parser, Function func, LinkedList<Expression> parameters, Class c) {
         super(parser, func.getDatatype());
-        if (func.getDatatype() == null) setDatatype(new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        if (func.getDatatype() == null) setDatatype(new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.func = func;
         this.parameters = parameters;
         this.c = c;

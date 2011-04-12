@@ -15,7 +15,7 @@ public abstract class ExpressionBoolean extends Expression {
      * @param num
      */
     public ExpressionBoolean(Parser p, boolean num) {
-        super(p,new Datatype(Datatype.BOOLEAN_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.BOOLEAN_DATATYPE,0,null));
 
         this.number = num;
     }

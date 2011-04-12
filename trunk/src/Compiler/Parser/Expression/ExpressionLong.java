@@ -16,7 +16,7 @@ public abstract class ExpressionLong extends Expression {
      * @param num
      */
     public ExpressionLong(Parser p, long num) {
-        super(p,new Datatype(Datatype.LONG_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.LONG_DATATYPE,0,null));
 
         this.number = num;
     }

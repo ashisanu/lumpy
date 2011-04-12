@@ -152,7 +152,7 @@ public class CParser extends Parser {
                         for (Variable par: cfunc.getParameter()) {
                             pars.add(par.getDatatype());
                         }
-                        Datatype tmp = new Datatype(cfunc.getDatatype(),cfunc.getDatatype().getDimensions(),pars,cfunc.getDatatype().getGenerics());
+                        Datatype tmp = new Datatype(cfunc.getDatatype(),cfunc.getDatatype().getDimensions(),pars);
                         String tmpStr = "";
                         tmpStr += "#ifndef _"+tmp.toString()+"_"+newLine();
                         tmpStr += "#define _"+tmp.toString()+"_"+newLine();

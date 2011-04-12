@@ -22,7 +22,7 @@ public abstract class ExpressionEachIn extends Expression {
      * @param init
      */
     public ExpressionEachIn(Parser p,Class c,ExpressionBlock block, ExpressionIdentifier var, ExpressionIdentifier in, Expression init) {
-        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null,null));
+        super(p,new Datatype(Datatype.VOID_DATATYPE,0,null));
         this.block = block;
         this.var = var;
         this.in = in;

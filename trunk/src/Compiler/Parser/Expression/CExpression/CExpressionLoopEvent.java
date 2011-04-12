@@ -14,7 +14,7 @@ public class CExpressionLoopEvent extends ExpressionLoopEvent {
 
     @Override
     public String generate() {
-        String str = "stack_leave();"+getParser().newLine();
+        String str = "";
         if (isContinue) {
             str += "continue;"+getParser().newLine();
         } else {
