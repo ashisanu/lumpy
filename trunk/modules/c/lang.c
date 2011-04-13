@@ -7,4 +7,5 @@ void print_string(GCNode* str) {
 
 void print_int(int i) {
     printf("%d\n",i);
+
 }

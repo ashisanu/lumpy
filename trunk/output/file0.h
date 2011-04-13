@@ -39,7 +39,6 @@ typedef struct __node_templates__int__ {
 GCNode* cast2node_templates__int(GCNode* node);
 GCNode* new_node_templates__int();
 GCNode* joinstr(GCNode* str1, GCNode* str2);
-void print_string(GCNode* text);
 void print_int(int text);
 void function_program();
 int node_templates__int_get_value(GCNode* _this_);

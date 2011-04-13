@@ -43,20 +43,14 @@ class<datatype> node
 	end
 end
 
-
 function program()
 	var list = new list<int>()
 	list.add 10
 	list.add 23
 	list.add 900
-	print "ok"
-	var j = 0
+
+	
 	loop var i in list
 		print i
-		j = j + 1
-		if j > 10
-			exit
-		end
 	end
 end
-
