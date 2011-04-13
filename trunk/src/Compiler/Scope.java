@@ -95,7 +95,7 @@ public class Scope {
                         }
                         i++;
                     }
-                    if (same) {
+                    if (same && func.isCallable()) {
                         parser.error("Duplicate function. '"+func.getName()+"'");
                     }
                 }

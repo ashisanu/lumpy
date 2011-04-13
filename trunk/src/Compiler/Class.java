@@ -1,6 +1,7 @@
 package Compiler;
 
 import Compiler.Parser.Expression.ExpressionDeclaration;
+import Compiler.Parser.Parser;
 import java.util.*;
 
 /**
@@ -18,12 +19,13 @@ public class Class extends Datatype {
     private HashMap<String, String> replacer;
     private Scope scope;
     private Class inherit;
+    private Parser parser; //in welchem parser wurde es definiert
 
     /**
      * Erstellt eine im programm definierte Klasse
      * @param name
      */
-    public Class(String name, Token tok) {
+    public Class(String name, Token tok, Parser p) {
         super(classID++,0,null);
         this.attribute = new LinkedList<Variable>();
         this.methods = new LinkedList<Function>();
@@ -32,6 +34,7 @@ public class Class extends Datatype {
         this.inheriting = new LinkedList<Class>();
         this.name = name;
         this.startToken = tok;
+        this.parser = p;
     }
 
     /**
@@ -181,5 +184,11 @@ public class Class extends Datatype {
      */
     public HashMap<String,String> getReplacer() {
         return replacer;
+    }
+    /**
+     * Gibt den Parser zurück, wos deklariert wurde
+     */
+    public Parser getParser() {
+        return parser;
     }
 }

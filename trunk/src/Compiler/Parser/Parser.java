@@ -117,7 +117,7 @@ public abstract class Parser {
                     while (!tok.getText().equals(">") && iterator.hasNext()) tok = iterator.next();
                     tok = iterator.next();
                 }
-                Class.newClass(new Class(tok.getText(),t));
+                Class.newClass(new Class(tok.getText(),t,this));
             }
         }
         iterator = tokens.listIterator();
@@ -243,7 +243,7 @@ public abstract class Parser {
      */
     public void compileFunction(Function func) throws SyntaxException {
         if (func.isCompiled()) return;
-        func.compile();
+        
         Token safe = getCurrent();
         func.use();
 
@@ -282,14 +282,11 @@ public abstract class Parser {
                         tmpReplacer = currentClass.getReplacer();
                     }
 
-
+                    func.compile();
                     ExpressionBlock funcBlock = block(generator); //nun den block parsen
                     replacer = tmpReplacer;
                     
-                    if (codeFunc.isGenerator()) {
-                        inGenerator = true;
-                    }
-                    
+
                     codeFunc.setBlock(funcBlock);
                     for (Variable par: codeFunc.getParameter()) {
                         funcBlock.addVariable(par);
@@ -1080,7 +1077,7 @@ public abstract class Parser {
             match("end");
         } else {
             while (!isToken("end") || step >= 0) {
-                getNext();
+                
                 for (String key: scopeKeyword) {
                     if (getCurrent().getText().equals(key)) {
                         if (key.equals("inline")) {
@@ -1093,9 +1090,11 @@ public abstract class Parser {
                         break;
                     }
                 }
+                getNext();
                 if (getCurrent().getText().equals("end")) {
                     step--;
                 }
+                
             }
             match("end");
         }
@@ -1104,36 +1103,40 @@ public abstract class Parser {
      * kompiliert eine generische klasse, und zwar in den notwendigen datentyp
      */
     public String compileGenericClass(Class c, LinkedList<Datatype> data) throws SyntaxException {
-        String name = c.getName() + "_templates_";
-        for (Datatype d: data) {
-            name += "_"+d.toString();
-        }
-
-        //schauen ob es die klasse bereits gibt
-        boolean alreadyExist = false;
-        Class findClass = null;
-        for (Class testC: Class.getClasses()) {
-            if (name.equals(testC.getName())) {
-                //generics prüfen
-                findClass = testC;
-                alreadyExist = true;
-            }
-        }
-        if (!alreadyExist) {
-            Token tmp = getCurrent();
-            ListIterator tmp2 = iterator;
-            iterator = tokens.listIterator(tokens.indexOf( c.getStartToken() ));
-            getNext();
-            currentTemplates = data;
-            keyWord();
-            currentTemplates = null;
-
-            iterator = tmp2;
-            current = tmp;
-
-            return name;
+        if (c.getParser() != this) {
+            return c.getParser().compileGenericClass(c, data);
         } else {
-            return findClass.getName();
+            String name = c.getName() + "_templates_";
+            for (Datatype d: data) {
+                name += "_"+d.toString();
+            }
+
+            //schauen ob es die klasse bereits gibt
+            boolean alreadyExist = false;
+            Class findClass = null;
+            for (Class testC: Class.getClasses()) {
+                if (name.equals(testC.getName())) {
+                    //generics prüfen
+                    findClass = testC;
+                    alreadyExist = true;
+                }
+            }
+            if (!alreadyExist) {
+                Token tmp = getCurrent();
+                ListIterator tmp2 = iterator;
+                iterator = tokens.listIterator(tokens.indexOf( c.getStartToken() ));
+                getNext();
+                currentTemplates = data;
+                keyWord();
+                currentTemplates = null;
+
+                iterator = tmp2;
+                current = tmp;
+
+                return name;
+            } else {
+                return findClass.getName();
+            }
         }
      }
 
@@ -1167,6 +1170,13 @@ public abstract class Parser {
                 
                 Variable vari = new Variable(name, datatype);
                 if (inGenerator) {
+                    if (currentClass.getAttibutes() != null) {
+                        for (Variable att: currentClass.getAttibutes()) {
+                            if (att.getName().equals(vari.getName()) && !att.getDatatype().match(vari.getDatatype())) {
+                                error("Generator variable '"+vari.getName()+"' does not match with '"+att.getName()+"'.");
+                            }
+                        }
+                    }
                     currentClass.newAttribute(false, vari);
                     vari.use();
                 } else {
@@ -1367,7 +1377,7 @@ public abstract class Parser {
                                 inLoop = bef;
                                 return getManager().getEachInExpression(c,block, var, in, start);
                             } else {
-                                error("Could not find 'invoke'.");
+                                error("Could not find method 'invoke', 'hasnext' or 'start'.");
                             }
                         } else {
                             error("Cannot iterate through primitve datatype.");
@@ -1432,6 +1442,8 @@ public abstract class Parser {
             String name = "";
             HashMap<String, String> tmpReplacer = replacer;
             Class tmpClass = currentClass;
+            boolean tmpGenerator = inGenerator;
+            inGenerator = false;
             replacer = null;
             Class c = null;
             if (isToken("<")) {
@@ -1467,7 +1479,7 @@ public abstract class Parser {
 
                     name = getCurrent().getText()+n;
 
-                    Class.newClass(new Class(name,startToken));
+                    Class.newClass(new Class(name,startToken,this));
                 }
             } else {
                 name = getCurrent().getText();
@@ -1689,6 +1701,7 @@ public abstract class Parser {
             }
             currentClass = tmpClass;
             replacer = tmpReplacer;
+            inGenerator = tmpGenerator;
             
             return getManager().getEmptyExpression();
         } else if (isToken("function")) {
