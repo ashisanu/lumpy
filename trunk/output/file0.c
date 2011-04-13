@@ -21,44 +21,32 @@ int main(int argc, char *argv[]) {
 }
 
 
-void function_program() {
-	stack_enter(1);
+GCNode* cast2map(GCNode* node) {
+	node -> typid = TYP_MAP;
+	return node;
 	
-	//Line: 6
-	GCNode* _list_ = list_templates__int_new (new_list_templates__int() );
-	stack_create(&_list_, 0);
-	;
-	//Line: 7
-	list_templates__int_add (_list_, ((int)10) );
-	//Line: 8
-	list_templates__int_add (_list_, ((int)23) );
-	//Line: 9
-	list_templates__int_add (_list_, ((int)900) );
-	//Line: 12
-	int _i_ = ((int)0);
-	;
-	list_templates__int_start(_list_);
-	_i_ = list_templates__int_invoke(_list_);
-	while (list_templates__int_hasnext(_list_)) {
-		{
-			//Line: 13
-			print_string (joinstr(newString("data: "), int2string(_i_)) );
-			
-		}
-	_i_ = list_templates__int_invoke(_list_);
-	}
-	;
-	//Line: 16
-	print_string (newString("---------- infos: -------------") );
-	//Line: 17
-	print_string (joinstr(newString("size: "), int2string(list_templates__int_get_size(_list_))) );
-	//Line: 18
-	print_string (joinstr(newString("last: "), int2string(list_templates__int_get_last(_list_))) );
-	//Line: 19
-	print_string (joinstr(newString("first: "), int2string(list_templates__int_get_first(_list_))) );
-	stack_leave();
+}
+GCNode* new_map() {
+	GCNode* obj = gc_malloc(sizeof(map), &standardTrace);
+	((map*)obj -> data) -> typid = TYP_MAP;
+	obj -> typid = TYP_MAP;
+	return obj;
+	
+}
+GCNode* cast2mapentry(GCNode* node) {
+	node -> typid = TYP_MAPENTRY;
+	return node;
+	
+}
+GCNode* new_mapentry() {
+	GCNode* obj = gc_malloc(sizeof(mapentry), &standardTrace);
+	((mapentry*)obj -> data) -> typid = TYP_MAPENTRY;
+	obj -> typid = TYP_MAPENTRY;
+	return obj;
+	
+}
+void function_program() {
 	return;
-	stack_leave();
 	
 }
 
