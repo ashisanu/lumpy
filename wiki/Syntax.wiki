@@ -127,6 +127,18 @@ public property testVariable
 end
 }}}
 
+== indexer ==
+{{{
+public property fakeArray[index:int]
+    get
+        return this.array[index]
+    end
+    set
+        this.array[index] = value
+    end
+end
+}}}
+
 == templates: ==
 {{{
 class<Datatype> container
