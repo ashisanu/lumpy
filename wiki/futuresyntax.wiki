@@ -88,17 +88,7 @@ function program()
 end
 }}}
 
-== indexer ==
-{{{
-public property fakeArray[index:int]
-    get
-        return this.array[index]
-    end
-    set
-        this.array[index] = value
-    end
-end
-}}}
+
 
 == const ==
 {{{
