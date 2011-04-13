@@ -77,41 +77,27 @@ GCNode* new_node_templates__int() {
 	
 }
 void function_program() {
-	stack_enter(2);
+	stack_enter(1);
 	
-	//Line: 49
+	//Line: 48
 	GCNode* _list_ = list_templates__int_new (new_list_templates__int() );
 	stack_create(&_list_, 0);
 	;
-	//Line: 50
+	//Line: 49
 	list_templates__int_add (_list_, ((int)10) );
-	//Line: 51
+	//Line: 50
 	list_templates__int_add (_list_, ((int)23) );
-	//Line: 52
+	//Line: 51
 	list_templates__int_add (_list_, ((int)900) );
-	//Line: 53
-	print_string (newString("ok") );
 	//Line: 54
-	int _j_ = ((int)0);
-	;
-	//Line: 55
 	int _i_ = ((int)0);
 	;
 	list_templates__int_start(_list_);
 	_i_ = list_templates__int_invoke(_list_);
 	while (list_templates__int_hasnext(_list_)) {
 		{
-			//Line: 56
+			//Line: 55
 			print_int (_i_ );
-			//Line: 57
-			_j_ = (_j_ + ((int)1));
-			//Line: 58
-			if ((_j_ > ((int)10))) {
-				//Line: 59
-				break;
-				;
-				
-			};
 			
 		}
 	_i_ = list_templates__int_invoke(_list_);
@@ -324,7 +310,6 @@ int list_templates__int_invoke(GCNode* _this_) {
 					};
 					//Line: 21
 					((list_templates__int*)_this_ -> data) -> _status_ = -1;
-					stack_leave();
 					return 0;
 					case 2:
 					;
@@ -355,7 +340,6 @@ int list_templates__int_invoke(GCNode* _this_) {
 					};
 					//Line: 21
 					((list_templates__int*)_this_ -> data) -> _status_ = -1;
-					stack_leave();
 					return 0;
 					case 2:
 					;

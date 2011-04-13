@@ -24,7 +24,6 @@ public class CExpressionYield extends ExpressionYield {
         CExpressionBlock.yieldRetCounter++;
         if (isBreak) {
             str += CExpressionBlock.varAcc+" = -1;"+getParser().newLine();
-            str += "stack_leave();"+getParser().newLine();
             str += "return 0;"+getParser().newLine();
         } else {
             str += CExpressionBlock.varAcc+" = "+CExpressionBlock.yieldRetCounter+";"+getParser().newLine();
