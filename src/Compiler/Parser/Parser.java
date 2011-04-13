@@ -843,7 +843,21 @@ public abstract class Parser {
                         arrs.add(operator(0));
                         match("]");
                     }
-                    var = getManager().getArrayExpression(var, arrs);
+                    if (var instanceof ExpressionProperty) {
+                        Property p = ((ExpressionProperty)var).getProperty();
+                        if (arrs.size() == p.getIndexer().size()) {
+                            int i = 0;
+                            for (Datatype d: p.getIndexer()) {
+                                if (!d.match(arrs.get(i).getDatatype())) {
+                                    error("Indexer datatype does not match." + d.generateErrorMsg(arrs.get(i).getDatatype()));
+                                }
+                                i++;
+                            }
+                        }
+                        ((ExpressionProperty)var).setIndexer(arrs);
+                    } else {
+                        var = getManager().getArrayExpression(var, arrs);
+                    }
                 } else {
                     LinkedList<Function> functions = null;
                     String funcName = getPrevious().getText();
@@ -1543,6 +1557,22 @@ public abstract class Parser {
                     c.getStartDecs().add(dec);
                 } else if (isToken("property")) {
                     match("property");
+                    
+                    LinkedList<Variable> indexer = null;
+                    if (isToken("[")) {
+                        indexer = new LinkedList<Variable>();
+                        while (isToken("[")) {
+                            match("[");
+                            String indexerName = getCurrent().getText();
+                            getNext();
+                            Datatype indexerData = null;
+                            if (isToken(":")) {
+                                indexerData = datatype(true, false);
+                            }
+                            indexer.add(new Variable(indexerName,indexerData));
+                            match("]");
+                        }
+                    }
                     String propName = getCurrent().getText();
                     getNext();
                     
@@ -1552,18 +1582,25 @@ public abstract class Parser {
                     }
 
                     CodeFunction set = null, get = null;
-
+                    
                     
                     
                     while (!isToken("end")) {                        
                         if (isToken("get")) {
                             match("get");
 
+                            
+
                             if (get != null) error("Duplicate get property.");
                             
                             get = new CodeFunction("get_"+propName,data,new Scope("",this,null));
                             get.setStartToken(getCurrent());
                             get.setTyp(CodeFunction.IS_PROPERTY_GET);
+                            if (indexer != null) {
+                                for (Variable index:indexer) {
+                                    get.getParameter().add(index);
+                                }
+                            }
                             get.use();
                             c.newMethod(isPublic, get, thisVar, superVar);
                             getMainScope().newFunction(get);
@@ -1577,6 +1614,8 @@ public abstract class Parser {
                             overJumpBlock();
                         } else if (isToken("set")) {
                             match("set");
+                            
+                            
 
                             if (set != null) error("Duplicate set property.");
 
@@ -1585,6 +1624,11 @@ public abstract class Parser {
                             set.setStartToken(getCurrent());
                             set.setTyp(CodeFunction.IS_PROPERTY_SET);
                             set.use();
+                            if (indexer != null) {
+                                for (Variable index:indexer) {
+                                    set.getParameter().add(index);
+                                }
+                            }
                             c.newMethod(isPublic, set, thisVar, superVar);
                             getMainScope().newFunction(set);
 
@@ -1592,6 +1636,9 @@ public abstract class Parser {
                             overJumpBlock();
 
                             if (data == null) data = v.getDatatype();
+                            if (v.getDatatype() == null) {
+                                error("Cannot resolve variable datatype for set property "+propName);
+                            }
                             if (!v.getDatatype().match(data)) {
                                 error(v.getDatatype().generateErrorMsg(data));
                             }
@@ -1599,7 +1646,11 @@ public abstract class Parser {
                             match("\n");
                         }
                     }
-                    c.newProperty(new Property(propName,data,set,get));
+                    LinkedList<Datatype> datas = new LinkedList<Datatype>();
+                    for (Variable v: indexer) {
+                        datas.add(v.getDatatype());
+                    }
+                    c.newProperty(new Property(propName,data,set,get,datas));
                     match("end");
                 } else if (isToken("generator")) {
                     match("generator");

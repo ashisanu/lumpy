@@ -18,10 +18,15 @@ public class CExpressionProperty extends ExpressionProperty {
 
     public String generate() {
         String str = "";
+        String indexer = "";
+        for (Expression expr: super.indexer) {
+            indexer += ", ";
+            indexer += expr.generate();
+        }
         if (value != null) {
-            str += prop.getSet().generateFuncName()+"("+self.generate()+", "+value.generate()+")";
+            str += prop.getSet().generateFuncName()+"("+self.generate()+", "+value.generate()+indexer+")";
         } else {
-            str += prop.getGet().generateFuncName()+"("+self.generate()+")";
+            str += prop.getGet().generateFuncName()+"("+self.generate()+indexer+")";
         }
         return str;
     }
