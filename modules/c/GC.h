@@ -11,7 +11,10 @@ typedef struct gcnode { // Ein Node (= Objekt)
     struct gcnode* next; //Das nächste Node
 } GCNode;
 
-
+typedef struct _object_ {
+	int typid;
+	int superclass;
+} object;
 
 typedef struct gcframe {
     GCNode*** refs; //Alle Referenzen

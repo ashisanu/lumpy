@@ -1,9 +1,9 @@
 package Compiler.Parser.Expression.CExpression;
 
-import Compiler.Datatype;
 import Compiler.Parser.Expression.Expression;
 import Compiler.Parser.Expression.ExpressionYield;
 import Compiler.Parser.Parser;
+import java.util.LinkedList;
 
 /**
  * Ein yield in c
@@ -17,7 +17,7 @@ public class CExpressionYield extends ExpressionYield {
     public CExpressionYield(Parser p) {
         super(p);
     }
-
+    
     @Override
     public String generate() {
         String str = "";
