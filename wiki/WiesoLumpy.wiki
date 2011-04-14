@@ -1,0 +1,26 @@
+#summary Vorteile von Lumpy gegenüber anderen Sprachen.
+
+Sorry for all the english people, my english isn't good enough to write this article in understandable english.
+
+= Wieso Lumpy? = 
+Als ich mich vor einiger Zeit nach einer für mich "perfekten" Programmiersprache umgesehen habe, musste ich ernüchternd feststellen, dass es kaum welche gibt, die meinen Ansprüchen recht werden.
+
+Doch was erwarte ich von einer Sprache?
+ * Objektorientierte Programmierung
+ * Schnelle Ausführung
+ * Leistungsstarke Sprachelemente (Generatoren, Templates/Generics, Properties,...)
+ * Keine C Syntax
+ * Statische Typisierung
+ * Platformunabhängig
+ * Stabilität
+
+So. Welche Sprachen bleiben nun übrig? Mir fällt nun eigentlich keine Sprache ein, die wirklich all diese Elemente implementiert. Die Idee für eine für mich "perfekte" Programmiersprache war geboren.
+
+= Das _wirklich_ generische "loop". =
+... to be continued ...
+
+= Was bedeutet das nun für Sie? =
+
+Die oben angeführten Kriterien für eine Programmiersprache sind natürlich stark subjektiv. Jedoch glaube ich, dass ich nicht der Einzige bin, der so denkt.
+
+Vor allem die in Lumpy vorhandenen Sprachelemente sind überaus nützlich. 
