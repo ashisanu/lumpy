@@ -31,7 +31,7 @@ public class CExpressionFunctionDeclaration extends ExpressionFunctionDeclaratio
         }
         str += ") ";
         //schauen, ob dies eine methode ist
-        if (getFunction().getScope().getOwnerClass() != null) {
+        if (getFunction().getScope().getOwnerClass() != null && getFunction().getTyp() == Class.IS_CLASS) {
             Class myc = getFunction().getScope().getOwnerClass();
             getParser().identUp();
             str +="{"+getParser().newLine();

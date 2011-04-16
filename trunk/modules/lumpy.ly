@@ -8,13 +8,34 @@ language c
 end
 
 extern
-	function joinstr:String(str1:string, str2:string) = "joinstr" force
 	function gccollect:void() = "gccollect"
+	function intern_stringlength:int(str:string) = "str_len"
+	
 	
 	function print:void(text:String) = "print_string"
 	function print:void(text:int) = "print_int"
 end
 
+extension string
+	function length()
+		return intern_stringlength(this)
+	end
+	function toString()
+		return this
+	end
+end
+
+extension int
+	function toString()
+		return string(this)
+	end
+end
+
+extension float
+	function toString()
+		return string(this)
+	end
+end
 
 class<datatype> listValueIterator
 	private var l:list<datatype>

@@ -270,7 +270,7 @@ public class Datatype {
      * Ist es eine Klasse?
      */
     public boolean isClass() {
-        return getID() >= 1000;
+        return getID() >= 1000 || getID() == STRING_DATATYPE;
     }
     /**
      * Ist es eine vom GC verwaltete Sache?

@@ -21,32 +21,20 @@ int main(int argc, char *argv[]) {
 }
 
 
-GCNode* cast2map(GCNode* node) {
-	node -> typid = TYP_MAP;
-	return node;
-	
-}
-GCNode* new_map() {
-	GCNode* obj = gc_malloc(sizeof(map), &standardTrace);
-	((map*)obj -> data) -> typid = TYP_MAP;
-	obj -> typid = TYP_MAP;
-	return obj;
-	
-}
-GCNode* cast2mapentry(GCNode* node) {
-	node -> typid = TYP_MAPENTRY;
-	return node;
-	
-}
-GCNode* new_mapentry() {
-	GCNode* obj = gc_malloc(sizeof(mapentry), &standardTrace);
-	((mapentry*)obj -> data) -> typid = TYP_MAPENTRY;
-	obj -> typid = TYP_MAPENTRY;
-	return obj;
-	
-}
 void function_program() {
+	stack_enter(1);
+	
+	//Line: 7
+	print_string (joinstr(int2string(string_length (newString("lol") )), newString("lol")) );
+	//Line: 8
+	GCNode* _i_ = newString("lll");
+	stack_create(&_i_, 0);
+	;
+	//Line: 9
+	print_int (string_length (_i_ ) );
+	stack_leave();
 	return;
+	stack_leave();
 	
 }
 
