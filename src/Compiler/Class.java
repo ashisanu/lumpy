@@ -9,6 +9,9 @@ import java.util.*;
  * @author Coolo
  */
 public class Class extends Datatype {
+    public static final int IS_CLASS = 0;
+    public static final int IS_EXTENSION = 1;
+    public static final int IS_STRUCT = 2;
     public static int classID = 1000;
     private LinkedList<Variable> attribute;
     private LinkedList<Function> methods;
@@ -20,6 +23,8 @@ public class Class extends Datatype {
     private Scope scope;
     private Class inherit;
     private Parser parser; //in welchem parser wurde es definiert
+    private int typ = 0;
+
 
     /**
      * Erstellt eine im programm definierte Klasse
@@ -190,5 +195,19 @@ public class Class extends Datatype {
      */
     public Parser getParser() {
         return parser;
+    }
+
+    /**
+     * setzt den Typ
+     */
+    public void setTyp(int t) {
+        this.typ = t;
+    }
+
+    /**
+     * gibt den typ zurück
+     */
+    public int getTyp() {
+        return typ;
     }
 }

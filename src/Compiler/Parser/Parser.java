@@ -54,6 +54,7 @@ public abstract class Parser {
     private HashMap<String,String> replacer;
     private LinkedList<Datatype> currentTemplates;
 
+
     /**
      * Parst eine Datei mit dem gegebenen Analyser
      * @param analyser
@@ -105,6 +106,7 @@ public abstract class Parser {
         this.man = man;
         this.filePath = filePath;
         man.setParser(this);
+
 
         tokens = lexer.getTokens();
         iterator = tokens.listIterator();
@@ -519,11 +521,11 @@ public abstract class Parser {
             return getManager().getBooleanExpression(false);
         }
 
-        if (getCurrent().getText().length() > 1 && getCurrent().getText().substring(0, 1).equals("\"") && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("\"")) {
-            expr = getManager().getStringExpression(getCurrent().getText());
-            getNext();
-            return expr;
-        }
+        //if (getCurrent().getText().length() > 1 && getCurrent().getText().substring(0, 1).equals("\"") && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("\"")) {
+        //    expr = getManager().getStringExpression(getCurrent().getText());
+        //    getNext();
+        //    return expr;
+        //}
         expr = variableExpression();
         if (expr != null) {
             return expr;
@@ -586,6 +588,7 @@ public abstract class Parser {
         ExpressionIdentifier var = null;
         boolean existInClass = false;
         boolean isAttribute = false;
+        boolean isExtensionAccess = false;
         if (currentClass != null) {
             for (Variable v: currentClass.getAttibutes()) {
                 if (isToken(v.getName())) {
@@ -604,9 +607,15 @@ public abstract class Parser {
             }
             if (isToken("new")) existInClass = false;
         }
-        if (getScope().getVariable(getCurrent().getText())!=null || getScope().getFunction(getCurrent().getText()) != null || Datatype.Name2Int(getCurrent().getText()) != -1 || isToken("new") || isToken("function")) {
+        if (getCurrent().getText().length() > 1 && getCurrent().getText().substring(0, 1).equals("\"") && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("\"")) {
+            isExtensionAccess = true;
+        }
+        
+        if (getScope().getVariable(getCurrent().getText())!=null || getScope().getFunction(getCurrent().getText()) != null || Datatype.Name2Int(getCurrent().getText()) != -1 || isToken("new") || isToken("function") || isExtensionAccess) {
             if (var == null && getScope().getVariable(getCurrent().getText()) != null) {
                 var = getManager().getVariableExpression(getScope().getVariable(getCurrent().getText()));
+            } else if (isExtensionAccess) {
+                var = getManager().getStringExpression(getCurrent().getText());
             } else if (existInClass) {
                 if (isAttribute) {
                     Variable vari = null;
@@ -778,8 +787,11 @@ public abstract class Parser {
                 if (isToken(".") && var != null) {
                     match(".");
                     //omg es ist ein zugriff
-                    //schauen ob Variable
-                    
+                    //schauen ob MetaClass
+                    if (var instanceof ExpressionString) {
+                        System.out.println("LOOL");
+                    }
+
                     Datatype curData = var.getDatatype();
                     if (curData.match(new Datatype(curData,0,null)) && curData.isClass()) {
                         //okay, nun schauen ob es sich um eine methode oder attribut handelt.
@@ -836,6 +848,7 @@ public abstract class Parser {
                     } else {
                         error("Cannot find identifier of datatype '"+curData.toString()+"'");
                     }
+                    
                 } else if (isToken("[") && var != null) {
                     LinkedList<Expression> arrs = new LinkedList<Expression>();
                     while (isToken("[")) {
@@ -865,7 +878,7 @@ public abstract class Parser {
                     boolean isFunc = false;
                     boolean isAnonyme = false;
                     if (var != null) {
-                        if (var.getVariable() != null && var.getDatatype() != null && var.getDatatype().getDimensions() == 0 && var.getDatatype().getParameters() == null && var instanceof ExpressionMethod) {
+                        if (var.getDatatype() != null && var.getDatatype().getDimensions() == 0 && var.getDatatype().getParameters() == null && var instanceof ExpressionMethod) {
                             Class c = ((ExpressionMethod)var).getOwnerClass();
                             functions = new LinkedList<Function>();
                             for (Function func: c.getMethods()) {
@@ -1449,8 +1462,19 @@ public abstract class Parser {
             }
             importParser(imp);
             return getManager().getEmptyExpression();
-        } else if (isToken("class")) {
-            match("class");
+        } else if (isToken("class") || isToken("extension")) {
+            
+            int mode;
+            if (isToken("class")) {
+                match("class"); 
+                mode = Class.IS_CLASS;
+            } else if (isToken("extension")) {
+                match("extension");
+                mode = Class.IS_EXTENSION;
+            } else {
+                match("struct");
+                mode = Class.IS_STRUCT;
+            }
             Token startToken = getCurrent();
             boolean baseClass = false;
             String name = "";
@@ -1460,7 +1484,7 @@ public abstract class Parser {
             inGenerator = false;
             replacer = null;
             Class c = null;
-            if (isToken("<")) {
+            if (isToken("<") && mode == Class.IS_CLASS) {
                 match("<");
                 boolean start = false;
                 LinkedList<String> types = new LinkedList<String>();
@@ -1499,7 +1523,12 @@ public abstract class Parser {
                 name = getCurrent().getText();
             }
             //name = getCurrent().getText() + name;
-            c = Class.getClassByName(name);
+            if (mode == Class.IS_EXTENSION) {
+                c = new Class(name,startToken,this);
+                Class.newClass(c);
+            } else {
+                c = Class.getClassByName(name);
+            }
             if (!baseClass) {
                 c.setReplacer(replacer);
             }
@@ -1507,7 +1536,7 @@ public abstract class Parser {
             currentClass = c;
             classes.add(c);
             getNext();
-            if (isToken("<")) { //vererbung
+            if (isToken("<") && mode == Class.IS_CLASS) { //vererbung
                 match("<");
 
                 do {
@@ -1522,7 +1551,12 @@ public abstract class Parser {
             match("\n");
             Scope tmp = currentScope;
             currentScope = new Scope(c.getName(),this, null);
-            Variable thisVar = new Variable("this",c);
+            Datatype thisDatatype = c;
+            if (mode == Class.IS_EXTENSION) {
+                thisDatatype = new Datatype(Datatype.Name2Int(c.getName()),0,null);
+            }
+
+            Variable thisVar = new Variable("this",thisDatatype);
             Variable superVar =  null;
             currentScope.newVariable(thisVar);
             if (c.getInherit() != null) {
@@ -1539,23 +1573,26 @@ public abstract class Parser {
             while (!isToken("end") && !baseClass) {
                 boolean isPublic = false;
                 boolean gen = false;
-                if (isToken("private")) {
-                    match("private");
-                } else if (isToken("public")) {
-                    match("public");
-                    isPublic = true;
-                } else {
-                    error("Expecting public/private.");
+                if (mode == Class.IS_CLASS) {
+                    if (isToken("private")) {
+                        match("private");
+                    } else if (isToken("public")) {
+                        match("public");
+                        isPublic = true;
+                    } else {
+                        error("Expecting public/private.");
+                    }
                 }
-
-                
-                if (isToken("var")) {
+                if (Class.IS_CLASS != mode) {
+                    isPublic = true;
+                }
+                if (isToken("var") && mode != Class.IS_EXTENSION) {
                     ExpressionDeclaration dec = (ExpressionDeclaration)keyWord();
                     for (Variable var: dec.getDecVar()) {
                         c.newAttribute(isPublic, var);
                     }
                     c.getStartDecs().add(dec);
-                } else if (isToken("property")) {
+                } else if (isToken("property")  && mode != Class.IS_EXTENSION) {
                     match("property");
                     
                     LinkedList<Variable> indexer = null;
@@ -1647,12 +1684,14 @@ public abstract class Parser {
                         }
                     }
                     LinkedList<Datatype> datas = new LinkedList<Datatype>();
-                    for (Variable v: indexer) {
-                        datas.add(v.getDatatype());
+                    if (indexer != null) {
+                        for (Variable v: indexer) {
+                            datas.add(v.getDatatype());
+                        }
                     }
                     c.newProperty(new Property(propName,data,set,get,datas));
                     match("end");
-                } else if (isToken("generator")) {
+                } else if (isToken("generator") && mode != Class.IS_EXTENSION) {
                     match("generator");
                     if (gen) error("Class can only have maximal one generator.");
                     gen = true;
@@ -1726,11 +1765,14 @@ public abstract class Parser {
                     overJumpBlock();
                     
                 } else if (isToken("function")) {
+
                     Expression expr = keyWord();
                     //getMainScope().getFunctions().removeLast();
 
                     expr.setLine(getCurrent().getLine());
-                    
+                    if (c.getTyp() != Class.IS_CLASS) {
+                        lastFunc.use();
+                    }
                     c.newMethod(isPublic, lastFunc,thisVar,superVar);
 
 
@@ -1771,6 +1813,7 @@ public abstract class Parser {
                 name = getCurrent().getText();
                 getNext(); //name
             }
+            
             Datatype data = null;
             if (currentClass != null && name.equals("new")) {
                 if (isToken(":")) {
@@ -1822,6 +1865,7 @@ public abstract class Parser {
             match("\n");
             
             if (!inExtern) {
+
                 overJumpBlock();
             }
             if (currentClass == null && !anonymous) getMainScope().newFunction(func);

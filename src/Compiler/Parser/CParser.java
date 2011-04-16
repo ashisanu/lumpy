@@ -52,6 +52,7 @@ public class CParser extends Parser {
         headerCode += "#endif"+newLine();
         //klassen definieren
         for (Class c: getClasses()) {
+            if (c.getTyp() == Class.IS_EXTENSION) continue;
             headerCode += "#define TYP_"+c.getName().toUpperCase()+" "+c.getUnsafeID()+newLine();
             identUp();
             headerCode += "typedef struct __"+c.getName()+"__ {"+newLine();
@@ -136,7 +137,7 @@ public class CParser extends Parser {
         Scope scope = getMainScope();
          //funktionheaders machen
         for (Function func:scope.getFunctions()) {
-            if (func.isUsed() && !func.isDefined()) { // && ((func instanceof CodeFunction && ((CodeFunction)func).getScope().getParser() != this) || !(func instanceof CodeFunction))) {
+            if (func.isUsed() && (!func.isDefined() || !isMain)) { // && ((func instanceof CodeFunction && ((CodeFunction)func).getScope().getParser() != this) || !(func instanceof CodeFunction))) {
                 func.define();
                 if (func instanceof CodeFunction) {
                     for (ExpressionFunctionDeclaration expr: getFunctionDeclaration()) {

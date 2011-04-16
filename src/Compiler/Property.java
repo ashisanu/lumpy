@@ -14,7 +14,6 @@ public class Property extends Variable {
         this.set = set;
         this.get = get;
         this.indexer = indexer;
-        set.setDatatype(data);
     }
 
 

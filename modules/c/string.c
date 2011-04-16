@@ -15,23 +15,23 @@ GCNode* newString(char* str) {
 char* toCString(GCNode* node) {
 	return (char*)node->data;
 }
-int len(GCNode* node) {
+int str_len(GCNode* node) {
 	char* str;
 	str=((char*)node->data);
 	int len=strlen(str);
 	return len;
 }
 
-int asc(GCNode* node) {
+int str_asc(GCNode* node) {
 	char* str;
 	str=((char*)node->data);
-	if (len(node)==0) {
+	if (str_len(node)==0) {
 		return 0;
 	}
 	int data=str[0];
 	return data;
 }
-GCNode* chr(int txt) {
+GCNode* str_chr(int txt) {
 	char* str;
 	str=(char*)malloc(3*sizeof(char));
 	str[0]=txt;
@@ -133,7 +133,7 @@ GCNode* joinstr(GCNode* node1, GCNode* node2) {
 }
 
 
-int instr(GCNode* node1, GCNode* node2, int start) {
+int str_instr(GCNode* node1, GCNode* node2, int start) {
 	char* str1;
 	char* str2;
 	str1=((char*)node1->data);
@@ -141,9 +141,9 @@ int instr(GCNode* node1, GCNode* node2, int start) {
 	int i=0;
 	int j=0;
 	char find=0;
-	for (i=start;i<len(node1);i++) {
+	for (i=start;i<str_len(node1);i++) {
 		find=1;
-		for (j=0;j<len(node2) && (i+j)>len(node1);j++) {
+		for (j=0;j<str_len(node2) && (i+j)>str_len(node1);j++) {
 			if (str1[i+j]!=str2[j]) {
 				find=0;
 				break;
@@ -156,9 +156,9 @@ int instr(GCNode* node1, GCNode* node2, int start) {
 	return -1;
 }
 
-GCNode* mid(GCNode* node, int von, int bis) {
+GCNode* str_mid(GCNode* node, int von, int bis) {
 	char* str = (char*)node->data;
-	if (bis==-1) bis=(len(node))-von;
+	if (bis==-1) bis=(str_len(node))-von;
 
 	int newlen = bis-von+1;
 
@@ -175,18 +175,18 @@ GCNode* mid(GCNode* node, int von, int bis) {
 	return newString(ret);
 }
 
-GCNode* left(GCNode* str, int anzahl) {
-	return mid(str, 0, anzahl);
+GCNode* str_left(GCNode* str, int anzahl) {
+	return str_mid(str, 0, anzahl);
 }
 
-GCNode* right(GCNode* str, int anzahl) {
-	return mid(str,len(str)-anzahl,anzahl);
+GCNode* str_right(GCNode* str, int anzahl) {
+	return str_mid(str,str_len(str)-anzahl,anzahl);
 }
 
-GCNode* upper(GCNode* node) {
+GCNode* str_upper(GCNode* node) {
 	char* str = (char*)node->data;
 	char* ret;
-	ret=(char*) malloc((len(node) + 1)* sizeof(char));
+	ret=(char*) malloc((str_len(node) + 1)* sizeof(char));
 	int i=0;
 
 	for( i = 0; str[ i ]; i++)
@@ -195,10 +195,10 @@ GCNode* upper(GCNode* node) {
 	return newString(ret);
 }
 
-GCNode* lower(GCNode* node) {
+GCNode* str_lower(GCNode* node) {
 	char* str = (char*)node->data;
 	char* ret;
-	ret=(char*) malloc((len(node) + 1)* sizeof(char));
+	ret=(char*) malloc((str_len(node) + 1)* sizeof(char));
 	int i=0;
 
 	for( i = 0; str[ i ]; i++)
@@ -262,28 +262,28 @@ char* internreplace(char* source_str,char* search_str,char* replace_str) {
 		free(nstr);
 	return ostr;
 }
-GCNode* replace(GCNode* str1, GCNode* str2, GCNode* str3, int start) {
+GCNode* str_replace(GCNode* str1, GCNode* str2, GCNode* str3, int start) {
 	char* ret="";
-	ret=internreplace((char*)(mid(str1,start,-1)->data),(char*)str2->data,(char*)str3->data);
-	return joinstr(mid(str1,0,start),newString(ret));
+	ret=internreplace((char*)(str_mid(str1,start,-1)->data),(char*)str2->data,(char*)str3->data);
+	return joinstr(str_mid(str1,0,start),newString(ret));
 }
-GCNode* trim(GCNode* node) {
+GCNode* str_trim(GCNode* node) {
 	char* str=(char*)node->data;
 	int start, end;
 	int i=0;
 	start=0;
-	end=len(node)-1;
-	for (i=0;i<len(node);i++) {
+	end=str_len(node)-1;
+	for (i=0;i<str_len(node);i++) {
 		if (str[i]!=' ' && str[i]!='\t') {
 			start=i;
 			break;
 		}
 	}
-	for (i=len(node)-1;i>0;i--) {
+	for (i=str_len(node)-1;i>0;i--) {
 		if (str[i]!=' ' && str[i]!='\t') {
 			end=i;
 			break;
 		}
 	}
-	return mid(node,start,end-start+1);
+	return str_mid(node,start,end-start+1);
 }
