@@ -96,19 +96,7 @@ const lol = 10
 lol = 100 //error
 }}}
 
-== interfaces ==
-{{{
-interface comperable
-    public const:int test = 200
-    public compareTo:boolean(other:object)
-end
-class test < object implements comperable
- //...
-end
-}}}
-
-
-== call by refernce ==
+== call by reference ==
 {{{
 function swap(ref left:int, ref right:int)
     var tmp = left
