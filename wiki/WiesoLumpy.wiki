@@ -38,14 +38,13 @@ C# hingegen schlägt hier den richtigen Weg ein. Die Sprache ist einfach, kann a
 
 Ich versuche in Lumpy weitgehend alle sinnvollen (gut darüber lässt sich nun auch streiten...) Sprachelemente zu implementieren. Jedoch sollte dies nicht zu sehr ausarten, wie in Perl. 
 
-= Schnelle Ausführung =
+= Die _wirklich_ schnelle Ausführung =
 Lumpy wird primär in die Programmiersprache C übersetzt. Hierdurch, wird einerseits eine hohe Platformunabhängigkeit erreicht (C Compiler gibt es auf _jeder_ Platform) andererseits auch eine sehr schnelle Ausführungsgeschwindigkeit. C ist mitunter eine der schnellsten Hochsprachen, da wirklich viele sehr gut optimierende Compiler existieren.
 
 Doch wieso wird überhaupt in eine Hochsprache wie  C kompiliert? Lumpy könnte doch genauso in eine VM kompiliert werden, wie zum Beispiel JVM oder CIL Code?
 Grundsätzlich sind Virtuelle Maschinen _immer_ langsamer als direkt kompilierter Code. Dies liegt einfach an der Natur von VMs. Sie "interpretieren" den Bytecode quasi. Nun werden einige meinen, es gäbe Just In Time Compiler. Jedoch sind diese erstens nicht immer ganz so "just in time" außerdem haben sie trotzdem noch einen graviernden Nachteil: Jeder der Lumpy Programme ausführen will, braucht diese VM installiert. Hierdurch wird die Benützung durch User stark reduziert, da kaum einer bereit ist eine VM zu installieren. 
 
 CIL ist wiederum Microsoft abhängig (und Mono ist auch nicht so das gelbe vom Ei) und die JavaVM ist vergleichsweise langsam.
-
 
 = Was bedeutet das nun für Sie? =
 
