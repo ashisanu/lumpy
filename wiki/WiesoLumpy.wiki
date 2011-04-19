@@ -22,7 +22,7 @@ Die Schleifen in Lumpy werden alle mit loop eingeleitet. Dadurch gibt es keine U
 Doch wo liegt der Vorteil hierbei?
 Hauptsächlich ist hierbei der Hintergrundgedanke, dass jede Schleife gleich behandelt werden soll. Wieso sollte der Programmierer zwischen einer Zählschleife und einer Bedingungsschleife unterscheiden? Beide erledigen das wiederholte Ausführen von Kommandos.
 
-Außerdem ist es für meinen Geschmack um einiges übersichtlicher. Da hierdurch Codezeilen um einiges homogener aussehen. Zugegeben, dies ist wiederum ein sehr objektives Argument, allerdings hoffe ich, dass auch andere so denken wie ich.
+Außerdem ist es für meinen Geschmack um einiges übersichtlicher. Da hierdurch Codezeilen um einiges homogener aussehen. Zugegeben, dies ist wiederum ein sehr subjektives Argument, allerdings hoffe ich, dass auch andere so denken wie ich.
 
 Nebenbei, gibt es bereits so viele Programmiersprachen, welche "for" und "while" verwenden, wieso nicht mal etwas Neues ausprobieren. Nun werden einige sicher denken "Wieso braucht eine erzwungene "Verschlechtbesserung"". Dies ist einfach erklärt: Wenn man nichts Neues ausprobiert, dann stagniert man immer auf demselben Niveau.
 
