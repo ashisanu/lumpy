@@ -209,6 +209,15 @@ import "file.h" //header files
 import "file.o" //object files
 }}}
 
+== increment/decrement ==
+There are no "++" or "--" operators. But there are "increment" and "decrement" statements.
+{{{
+var i = 0
+increment i
+decrement i
+print i //0
+}}}
+
 == extern (interacting with libraries): ==
 {{{
 extern
