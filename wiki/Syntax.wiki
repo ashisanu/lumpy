@@ -234,6 +234,7 @@ catch string
 end
 catch
     print "unknown"
+end
 finally
     print "there was an exception"
 end
