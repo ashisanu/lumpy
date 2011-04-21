@@ -218,6 +218,27 @@ decrement i
 print i //0
 }}}
 
+== exception ==
+{{{
+try ex
+    var test:object = null
+    test.toString
+    throw "lol"
+    throw 42
+end
+catch NullPointerException
+    print ex.toString()
+end
+catch string
+    print ex
+end
+catch
+    print "unknown"
+finally
+    print "there was an exception"
+end
+}}}
+
 == extern (interacting with libraries): ==
 {{{
 extern
