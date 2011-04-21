@@ -13,9 +13,6 @@ Lumpy only knows "private" and "public" for information hinding within classes. 
 Lumpy uses type inference. That means, you often (not always) need not to specify the datatype of a variable. Only in connection with templates,extern functions or metafunctions you HAVE TO. Sometimes the compiler can't find the datatype of a class attribute. 
 
 
-Lumpy handles nearly everything as an object. Except the primitive datatypes "int","byte","short","long","boolean","float","double" are no objects. Arrays and strings are of course objects.
-
-
 
 All features are fully working (except the "extern" statement.):
 = Details =
