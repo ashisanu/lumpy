@@ -75,7 +75,7 @@ public class CExpressionBlock extends ExpressionBlock {
         
 
         if (varCount > 0) {
-            str = "{"+getParser().newLine()+"stack_enter("+varCount+");"+getParser().newLine()+str;
+            str = "{"+getParser().newLine()+"stack_enter("+varCount+", NULL);"+getParser().newLine()+str;
             str += "stack_leave();"+getParser().newLine();
         } else str = "{" + str;
         getParser().identDown();

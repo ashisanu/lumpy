@@ -201,6 +201,27 @@ public abstract class ExpressionManager {
      * @return
      */
     public abstract ExpressionProperty getPropertyExpression(Property prop,ExpressionIdentifier self);
+
+    /**
+     * Increment/Decrement expression
+     */
+    public abstract ExpressionIncDec getIncDecExpression(ExpressionIdentifier var, boolean inc);
+    /**
+     * Ein Try block
+     * @param mainBlock
+     * @param catches
+     * @param datas
+     * @param finallyBlock
+     * @param variableName
+     * @return
+     */
+    public abstract ExpressionTry getTryExpression(ExpressionBlock mainBlock, LinkedList<ExpressionBlock> catches, LinkedList<Datatype> datas, ExpressionBlock finallyBlock, String variableName);
+    /**
+     * Wirft eine Exception
+     * @param expr
+     * @return
+     */
+    public abstract ExpressionThrow getThrowExpression(Expression expr);
     /**
      * Liefert den Parser zurück
      * @return

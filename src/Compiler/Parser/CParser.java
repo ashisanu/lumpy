@@ -6,6 +6,7 @@ import Compiler.Class;
 import Compiler.Parser.Expression.*;
 import Compiler.Parser.Expression.CExpression.CExpressionAssignment;
 import Compiler.Parser.Expression.CExpression.CExpressionNew;
+import Compiler.Parser.Expression.CExpression.CExpressionTry;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,86 +53,87 @@ public class CParser extends Parser {
         headerCode += "#endif"+newLine();
         //klassen definieren
         for (Class c: getClasses()) {
-            if (c.getTyp() == Class.IS_EXTENSION) continue;
-            headerCode += "#define TYP_"+c.getName().toUpperCase()+" "+c.getUnsafeID()+newLine();
-            identUp();
-            headerCode += "typedef struct __"+c.getName()+"__ {"+newLine();
-            if (c.getInherit() != null) {
-                headerCode +="//Inherit from: "+c.getInherit().getName()+newLine();
-            }
-            //headerCode += "VFunction* vtable;"+newLine();
-            headerCode += "int typid;"+newLine();
-            headerCode += "int superclass;"+newLine();
-            for (Variable attribute: c.getAttibutes()) {
-                if (attribute.isUsed()) {
-                    headerCode += CExpressionAssignment.getDatatype(attribute.getDatatype())+" _"+attribute.getName()+"_;"+newLine();
+            if (c.getTyp() != Class.IS_EXTENSION) {
+                headerCode += "#define TYP_"+c.getName().toUpperCase()+" "+c.getUnsafeID()+newLine();
+                identUp();
+                headerCode += "typedef struct __"+c.getName()+"__ {"+newLine();
+                if (c.getInherit() != null) {
+                    headerCode +="//Inherit from: "+c.getInherit().getName()+newLine();
                 }
-            }
-
-            identDown();
-
-            headerCode += newLine();
-            headerCode += "} "+c.getName()+";"+newLine();
-
-            headerCode += "GCNode* cast2"+c.getName()+"(GCNode* node);"+newLine();
-            /*
-            functionCode += "VFunction vtable_"+c.getName()+"[] = {";
-            boolean start = false;
-            for (Function func: c.getMethods()) {
-                if (start) functionCode += ", ";
-
-                functionCode += "(VFunction)"+func.generateFuncName();
-
-                start = true;
-            }
-            functionCode += "};"+newLine();*/
-
-            identUp();
-            functionCode += "GCNode* cast2"+c.getName()+"(GCNode* node) {"+newLine();
-            functionCode += "";
-            //functionCode += "(("+c.getName()+"*)node) -> vtable = vtable_"+c.getName()+";"+newLine();
-            functionCode +=  "node -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
-            functionCode += "return node;"+newLine();
-            identDown();
-            functionCode += newLine();
-            functionCode += "}"+newLine();
-
-            identUp();
-
-
-            functionCode +="GCNode* new_"+c.getName()+"() {"+newLine();
-
-            functionCode += "GCNode* obj = gc_malloc(sizeof("+c.getName()+"), &standardTrace);"+newLine();
-            functionCode += "(("+c.toString()+"*)obj -> data) -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
-            if (c.getInherit() != null) functionCode += "(("+c.toString()+"*)obj -> data) -> superclass = TYP_"+c.getInherit().getName().toUpperCase()+";"+newLine();
-            functionCode += "obj -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
-
-            Class tmpC = c;
-
-            while (tmpC != null) {
-                for (ExpressionDeclaration dec: tmpC.getStartDecs()) {
-                    int i = 0;
-                    for (Variable att: dec.getDecVar()) {
-                        String init = "";
-                        if (dec.getValues().get(i) instanceof ExpressionEmpty) {
-                            init = att.getDatatype().createDatatypeExpression(getManager()).generate();
-                        } else {
-                            init = dec.getValues().get(i).generate();
-                        }
-                        if (att.isUsed()) functionCode += "(("+c.toString()+"*)obj -> data) -> "+CExpressionAssignment.getAccess(att)+" = " + init+ ";"+newLine();
-                        i++;
+                //headerCode += "VFunction* vtable;"+newLine();
+                headerCode += "int typid;"+newLine();
+                headerCode += "int superclass;"+newLine();
+                for (Variable attribute: c.getAttibutes()) {
+                    if (attribute.isUsed()) {
+                        headerCode += CExpressionAssignment.getDatatype(attribute.getDatatype())+" _"+attribute.getName()+"_;"+newLine();
                     }
                 }
-                tmpC = tmpC.getInherit();
+
+                identDown();
+
+                headerCode += newLine();
+                headerCode += "} "+c.getName()+";"+newLine();
+
+                headerCode += "GCNode* cast2"+c.getName()+"(GCNode* node);"+newLine();
+                /*
+                functionCode += "VFunction vtable_"+c.getName()+"[] = {";
+                boolean start = false;
+                for (Function func: c.getMethods()) {
+                    if (start) functionCode += ", ";
+
+                    functionCode += "(VFunction)"+func.generateFuncName();
+
+                    start = true;
+                }
+                functionCode += "};"+newLine();*/
+
+                identUp();
+                functionCode += "GCNode* cast2"+c.getName()+"(GCNode* node) {"+newLine();
+                functionCode += "";
+                //functionCode += "(("+c.getName()+"*)node) -> vtable = vtable_"+c.getName()+";"+newLine();
+                functionCode +=  "node -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
+                functionCode += "return node;"+newLine();
+                identDown();
+                functionCode += newLine();
+                functionCode += "}"+newLine();
+
+                identUp();
+
+
+                functionCode +="GCNode* new_"+c.getName()+"() {"+newLine();
+
+                functionCode += "GCNode* obj = gc_malloc(sizeof("+c.getName()+"), &standardTrace);"+newLine();
+                functionCode += "(("+c.toString()+"*)obj -> data) -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
+                if (c.getInherit() != null) functionCode += "(("+c.toString()+"*)obj -> data) -> superclass = TYP_"+c.getInherit().getName().toUpperCase()+";"+newLine();
+                functionCode += "obj -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
+
+                Class tmpC = c;
+
+                while (tmpC != null) {
+                    for (ExpressionDeclaration dec: tmpC.getStartDecs()) {
+                        int i = 0;
+                        for (Variable att: dec.getDecVar()) {
+                            String init = "";
+                            if (dec.getValues().get(i) instanceof ExpressionEmpty && att.isUsed()) {
+                                init = att.getDatatype().createDatatypeExpression(getManager()).generate();
+                            } else {
+                                init = dec.getValues().get(i).generate();
+                            }
+                            if (att.isUsed()) functionCode += "(("+c.toString()+"*)obj -> data) -> "+CExpressionAssignment.getAccess(att)+" = " + init+ ";"+newLine();
+                            i++;
+                        }
+                    }
+                    tmpC = tmpC.getInherit();
+                }
+                functionCode += "return obj;"+newLine();
+
+                identDown();
+                functionCode += newLine();
+
+                functionCode += "}"+newLine();
+
+                headerCode +="GCNode* new_"+c.getName()+"();"+newLine();
             }
-            functionCode += "return obj;"+newLine();
-
-            identDown();
-            functionCode += newLine();
-
-            functionCode += "}"+newLine();
-
-            headerCode +="GCNode* new_"+c.getName()+"();"+newLine();
         }
 
         Scope scope = getMainScope();
@@ -171,24 +173,26 @@ public class CParser extends Parser {
                         headerCode = tmpStr + headerCode;
                     }
                 }
-                headerCode += CExpressionAssignment.getDatatype(func.getDatatype()) + " "+func.generateFuncName()+"(";
-                boolean start = false;
-                if (func instanceof CodeFunction) {
-                    CodeFunction cfunc = (CodeFunction)func;
+                if (!(func instanceof CodeFunction) || ((CodeFunction)func).getScope().getParser() == this) {
+                    headerCode += CExpressionAssignment.getDatatype(func.getDatatype()) + " "+func.generateFuncName()+"(";
+                    boolean start = false;
+                    if (func instanceof CodeFunction) {
+                        CodeFunction cfunc = (CodeFunction)func;
 
-                    if (cfunc.getScope().getOwnerClass() != null) {
-                        headerCode += CExpressionAssignment.getDatatype(cfunc.getScope().getOwnerClass())+" _this_";
+                        if (cfunc.getScope().getOwnerClass() != null) {
+                            headerCode += CExpressionAssignment.getDatatype(cfunc.getScope().getOwnerClass())+" _this_";
+                            start = true;
+                        }
+
+                    }
+                    for (Variable param: func.getParameter()) {
+                        if (start) headerCode += ", ";
+                        headerCode += CExpressionAssignment.getDatatype(param.getDatatype())+" "+param.getName();
+
                         start = true;
                     }
-                    
+                    headerCode += ");"+newLine();
                 }
-                for (Variable param: func.getParameter()) {
-                    if (start) headerCode += ", ";
-                    headerCode += CExpressionAssignment.getDatatype(param.getDatatype())+" "+param.getName();
-
-                    start = true;
-                }
-                headerCode += ");"+newLine();
             }
         }
         
@@ -235,7 +239,24 @@ public class CParser extends Parser {
                 functionCode += newLine();
             }
         }
-
+        if (isMain) {
+            if (CExpressionTry.TRYCOUNT > 0) headerCode += "jmp_buf ";
+            for (int i = 0; i<CExpressionTry.TRYCOUNT;i++) {
+                if (i != 0) headerCode += ", ";
+                headerCode += "exc_env_"+i;
+            }
+            if (CExpressionTry.TRYCOUNT > 0) headerCode += ";"+newLine();
+            //defines für die datentypen definieren
+            for (int i = 100; i < 120; i++) {
+                Datatype data = new Datatype(i,0,null);
+                if (data != null && data.getUnsafeID() != -1 && data.getName() != null && !data.isNull() && !data.isVoid()) {
+                    headerCode += "#define TYP_"+data.getName().toUpperCase()+" "+data.getUnsafeID()+newLine();
+                    String name = data.getName();
+                    if (data.isGC()) name = "obj";
+                    headerCode += CExpressionAssignment.getDatatype(data)+" exc_holder_"+name+";"+newLine();
+                }
+            }
+        }
         /*
         for (Import imp: getImports()) {
             if (imp.getPath().endsWith("ly")) {

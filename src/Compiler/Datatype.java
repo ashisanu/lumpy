@@ -230,7 +230,11 @@ public class Datatype {
     public Expression createDatatypeExpression(ExpressionManager m) {
         switch (id) {
             case VOID_DATATYPE:
-                return null;
+                if (getParameters() != null) {
+                    return m.getNullExpression();
+                }   else {
+                    return null;
+                }
             case INT_DATATYPE:
                 return m.getIntegerExpression(0);
             case BYTE_DATATYPE:

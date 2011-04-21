@@ -35,7 +35,11 @@ public class CExpressionAssignment extends ExpressionAssignment {
         return name;
     }
     public static String getRealDatatype(Datatype typ) {
-        return typ.toString().replace("[]","*").replace("string", "char*");
+        String str = typ.toString().replace("[]","*");
+        if (str.length() >6 && str.substring(0, 6).equals("string")) {
+            str = "char*"+str.substring(7);
+        }
+        return str;
     }
     public static String getArrayDatatype(Datatype typ) {
         String name = typ.toString().replace("[]","");

@@ -26,7 +26,9 @@ public abstract class Parser {
         "generator",
         "property",
         "get",
-        "set"
+        "set",
+        "try",
+        "catch"
     };
     private Operator[] operators;
     private int maxPrio;
@@ -79,21 +81,23 @@ public abstract class Parser {
             Datatype.LONG_DATATYPE,
             Datatype.SHORT_DATATYPE
         };
+        int[] bool = {Datatype.BOOLEAN_DATATYPE};
         Operator[] o = {
-            new Operator("<", 2, add,Datatype.BOOLEAN_DATATYPE),
-            new Operator(">", 2, add,Datatype.BOOLEAN_DATATYPE),
-            new Operator("!=", 2, add,Datatype.BOOLEAN_DATATYPE),
+            new Operator("<", 3, add,Datatype.BOOLEAN_DATATYPE),
+            new Operator(">", 3, add,Datatype.BOOLEAN_DATATYPE),
+            new Operator("!=", 3, add,Datatype.BOOLEAN_DATATYPE),
             new Operator("+", 5, add),
             new Operator("-", 5, all),
             new Operator("*", 10, all),
             new Operator("/", 10, all),
-            new Operator("<=", 2, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator(">=", 2, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator("!=", 2, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator("==", 2, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator("and", 2, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator("or", 2, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator("xor", 2, all,Datatype.BOOLEAN_DATATYPE),
+            new Operator("<=", 3, all,Datatype.BOOLEAN_DATATYPE),
+            new Operator(">=", 3, all,Datatype.BOOLEAN_DATATYPE),
+            new Operator("!=", 3, all,Datatype.BOOLEAN_DATATYPE),
+            new Operator("==", 3, all,Datatype.BOOLEAN_DATATYPE),
+            new Operator("and", 1, bool,Datatype.BOOLEAN_DATATYPE),
+            new Operator("or", 1, bool,Datatype.BOOLEAN_DATATYPE),
+            new Operator("xor", 1, all,Datatype.BOOLEAN_DATATYPE),
+            new Operator("mod",1,all)
         };
 
         operators = o;
@@ -147,18 +151,7 @@ public abstract class Parser {
      */
     public void compile() throws SyntaxException {
         alreadyCompiled = true;
-        //marke alle überladene funktionen als überladen
-        for (Function func1 : currentScope.getFunctions()) {
-            for (Function func2 : currentScope.getFunctions()) {
-                if (func1 != func2 && func1.getName().equals(func2.getName())) {
-                    if (func1.getSynonym().equals(func2.getSynonym())) {
-                        func1.overloadSynonym();
-                        func2.overloadSynonym();
-                    }
-                }
-            }
-        }
-
+        
         //program kompilieren
         for (Function func: currentScope.getFunctions()) {
             if (func.getName().equals("program")) {
@@ -173,6 +166,18 @@ public abstract class Parser {
         ListIterator<Function> it = currentScope.getFunctions().listIterator();
         while (it.hasNext()) {
             if (!it.next().isUsed()) it.remove();
+        }
+
+        //marke alle überladene funktionen als überladen
+        for (Function func1 : currentScope.getFunctions()) {
+            for (Function func2 : currentScope.getFunctions()) {
+                if (func1 != func2 && func1.getName().equals(func2.getName())) {
+                    if (func1.getSynonym().equals(func2.getSynonym())) {
+                        func1.overloadSynonym();
+                        func2.overloadSynonym();
+                    }
+                }
+            }
         }
 
         for (Variable var: Variable.getVariables()) {
@@ -281,7 +286,7 @@ public abstract class Parser {
                     }
                     HashMap<String, String> tmpReplacer = replacer;
                     if (currentClass != null) {
-                        tmpReplacer = currentClass.getReplacer();
+                        replacer = currentClass.getReplacer();
                     }
 
                     func.compile();
@@ -448,7 +453,9 @@ public abstract class Parser {
             match("null");
             return getManager().getNullExpression();
         }
-
+        if (isToken("-")) {
+            
+        }
         if (isToken("(")) {
             match("(");
             expr = operator(0);
@@ -631,6 +638,7 @@ public abstract class Parser {
                 } else {
                     error("Methods need 'this'");
                 }
+
             } else if (isToken("new")) {
                 match("new");
                 String typ = getCurrent().getText();
@@ -686,7 +694,7 @@ public abstract class Parser {
 
                     //schauen ob zugreifbar
                     if (!call.getFunction().isPublic() && currentClass != c) {
-                        error("Cant access private contructor in non private scope.");
+                        error("Can't access private contructor in non private scope.");
                     }
 
                     var = call;
@@ -720,7 +728,7 @@ public abstract class Parser {
 
                     //schauen ob zugreifbar
                     if (!call.getFunction().isPublic() && currentClass != c) {
-                        error("Cant access private contructor in non private scope.");
+                        error("Can't access private contructor in non private scope.");
                     }
 
                     var = call;
@@ -878,7 +886,7 @@ public abstract class Parser {
                     boolean isFunc = false;
                     boolean isAnonyme = false;
                     if (var != null) {
-                        if (var.getDatatype() != null && var.getDatatype().getDimensions() == 0 && var.getDatatype().getParameters() == null && var instanceof ExpressionMethod) {
+                        if (var.getDatatype() == null || var.getDatatype().getDimensions() == 0 && var.getDatatype().getParameters() == null && var instanceof ExpressionMethod) {
                             Class c = ((ExpressionMethod)var).getOwnerClass();
                             functions = new LinkedList<Function>();
                             for (Function func: c.getMethods()) {
@@ -960,7 +968,7 @@ public abstract class Parser {
                 }
                 if (var.getVariable().getDatatype() == null) {
                     var.getVariable().setDatatype(expr.getDatatype());
-                } else if (expr instanceof ExpressionIdentifier) {
+                } else if (expr instanceof ExpressionIdentifier && ((ExpressionIdentifier)expr).getVariable()!= null) {
                     ((ExpressionIdentifier)expr).getVariable().setDatatype(var.getVariable().getDatatype());
                 }
                 
@@ -1260,6 +1268,36 @@ public abstract class Parser {
             }
 
             return getManager().getIfExpression(expr, block, elseBlock, list);
+        } else if (isToken("try")) {
+            match("try");
+            String name = getCurrent().getText();
+            LinkedList<ExpressionBlock> catches = new LinkedList<ExpressionBlock>();
+            LinkedList<Datatype> datas = new LinkedList<Datatype>();
+            ExpressionBlock finallyBlock = null;
+            ExpressionBlock mainBlock = block(false);
+            do {
+                match("catch"); //min. ein catch muss es geben
+
+                if (isToken("\n")) {
+                    //finally
+                    block(false);
+                } else {
+                    Datatype data = datatype(false,false);
+                    datas.add(data);
+                    Scope s = currentScope;
+                    Variable var = new Variable(name,data);
+                    currentScope = new Scope("",this,currentScope);
+                    currentScope.newVariable(var);
+                    catches.add(block(false));
+
+                    currentScope = s;
+                }
+            } while (isToken("catch"));
+
+            return getManager().getTryExpression(mainBlock, catches, datas, finallyBlock, name);
+        } else if (isToken("throw")) {
+            match("throw");
+            return getManager().getThrowExpression(operator(0));
         } else if (isToken("select")) {
             match("select");
             boolean tmp = inSelect;
@@ -1356,7 +1394,7 @@ public abstract class Parser {
                     var = variableExpression();
                     //zurück
                     while (getNext() != tmp);
-                    getNext();
+                    //getNext();
                     inLoop = bef;
                     //zusammensetzen
                     return getManager().getSimpleForExpression(var,start, to,step, block);
@@ -1492,6 +1530,7 @@ public abstract class Parser {
                     if (start) match(",");
                     types.add(getCurrent().getText());
                     getNext();
+                    start = true;
                 }
                 match(">");
                 c = Class.getClassByName(getCurrent().getText());
@@ -1534,6 +1573,7 @@ public abstract class Parser {
             }
 
             currentClass = c;
+            currentClass.setTyp(mode);
             classes.add(c);
             getNext();
             if (isToken("<") && mode == Class.IS_CLASS) { //vererbung
@@ -1771,8 +1811,9 @@ public abstract class Parser {
 
                     expr.setLine(getCurrent().getLine());
                     if (c.getTyp() != Class.IS_CLASS) {
-                        lastFunc.use();
+                        //lastFunc.use();
                     }
+
                     c.newMethod(isPublic, lastFunc,thisVar,superVar);
 
 
@@ -1782,7 +1823,11 @@ public abstract class Parser {
                     lastFunc.setName(tmpName);
 
                 } else {
-                    error("Expecting var, function, generator or property.");
+                    if (mode == Class.IS_EXTENSION) {
+                        error("Expecting function.");
+                    } else {
+                        error("Expecting var, function, generator or property.");
+                    }
                 }
                 match("\n");
                 while (isToken("\n")) getNext();
@@ -1889,6 +1934,10 @@ public abstract class Parser {
             } else {
                 error("Cannot call 'yield' in non generator.");
             }
+        } else if (isToken("increment")) {
+            boolean inc = isToken("increment");
+            match("increment");
+            return getManager().getIncDecExpression(variableExpression(), inc);
         } else if (isToken("return")) {
             if (getScope().getSuperScope() == null) {
                 error("Return only allowed in function.");
@@ -1897,7 +1946,7 @@ public abstract class Parser {
 
             Datatype data = currentFunction.getDatatype();
             Expression expr = null;
-            if (data == null || !data.isVoid()) {
+            if ((data == null || !data.isVoid()) && !isToken("\n")) {
                 expr = operator(0);
                 if (data == null) {
                     currentFunction.setDatatype(expr.getDatatype());

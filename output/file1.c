@@ -1,6 +1,7 @@
 #include "C:\Users\Coolo\Documents\NetBeansProjects\Lumpy/modules/c/gc.h"
 #include "C:\Users\Coolo\Documents\NetBeansProjects\Lumpy/modules/c/lang.h"
 #include "C:\Users\Coolo\Documents\NetBeansProjects\Lumpy/modules/c/string.h"
+#include "C:\Users\Coolo\Documents\NetBeansProjects\Lumpy/modules/c/exception.h"
 #include "file0.h"
 #include "file1.h"
 
@@ -9,18 +10,6 @@
 
 
 
-GCNode* cast2string(GCNode* node) {
-	node -> typid = TYP_STRING;
-	return node;
-	
-}
-GCNode* new_string() {
-	GCNode* obj = gc_malloc(sizeof(string), &standardTrace);
-	((string*)obj -> data) -> typid = TYP_STRING;
-	obj -> typid = TYP_STRING;
-	return obj;
-	
-}
 GCNode* cast2listvalueiterator(GCNode* node) {
 	node -> typid = TYP_LISTVALUEITERATOR;
 	return node;
@@ -67,12 +56,6 @@ GCNode* new_node() {
 	((node*)obj -> data) -> typid = TYP_NODE;
 	obj -> typid = TYP_NODE;
 	return obj;
-	
-}
-int string_length(GCNode* _this_) {
-	//Line: 22
-	return str_len (_this_ );
-	return ((int)0);
 	
 }
 
