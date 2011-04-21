@@ -81,7 +81,7 @@ public class CExpressionBlock extends ExpressionBlock {
         getParser().identDown();
         str += getParser().newLine();
         
-        str += "}";
+        str += "}"+getParser().newLine();
         CExpressionBlock.varCount = tmp;
         CExpressionDeclaration.decVar = decTmp;
         return str;

@@ -17,13 +17,18 @@ public class CExpressionReturn extends ExpressionReturn {
 
     @Override
     public String generate() {
+        String str = "";
         try {
-            String prefix = "stack_leave();"+getParser().newLine();
-            if (CExpressionBlock.varCount == 0) prefix = "";
+            if (CExpressionTry.currentExprTry != null) {
+                str += "finally:"+getParser().newLine();
+                str += CExpressionTry.currentExprTry.getFinallyBlock().generate();
+            }
+            if (CExpressionBlock.varCount != 0) str += "stack_leave();"+getParser().newLine();
             if (expr != null && !expr.getDatatype().isVoid())
-                return prefix+"return "+expr.generate();
+                str += "return "+expr.generate();
             else
-                return prefix+"return";
+                str += "return";
+            return str;
         } catch (SyntaxException ex) {}
         return "ERROR";
     }

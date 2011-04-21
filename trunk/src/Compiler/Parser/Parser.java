@@ -28,7 +28,8 @@ public abstract class Parser {
         "get",
         "set",
         "try",
-        "catch"
+        "catch",
+        "finally"
     };
     private Operator[] operators;
     private int maxPrio;
@@ -1275,12 +1276,13 @@ public abstract class Parser {
             LinkedList<Datatype> datas = new LinkedList<Datatype>();
             ExpressionBlock finallyBlock = null;
             ExpressionBlock mainBlock = block(false);
-            do {
+            while (isToken("catch")) {
                 match("catch"); //min. ein catch muss es geben
 
                 if (isToken("\n")) {
                     //finally
-                    block(false);
+                    datas.add(new Datatype(Datatype.VOID_DATATYPE,0,null));
+                    catches.add(block(false));
                 } else {
                     Datatype data = datatype(false,false);
                     datas.add(data);
@@ -1292,7 +1294,11 @@ public abstract class Parser {
 
                     currentScope = s;
                 }
-            } while (isToken("catch"));
+            }
+            if (isToken("finally")) {
+                match("finally");
+                finallyBlock = block(false);
+            }
 
             return getManager().getTryExpression(mainBlock, catches, datas, finallyBlock, name);
         } else if (isToken("throw")) {
