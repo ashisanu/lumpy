@@ -21,19 +21,6 @@ namespace program
 end
 }}}
 
-== exception ==
-{{{
-try
-    var test:object = null
-    test.toString
-end
-catch NullPointerException ex
-    print ex.toString()
-end
-finally
-    print "yeah"
-end
-}}}
 
 == flow based programming ==
 {{{
