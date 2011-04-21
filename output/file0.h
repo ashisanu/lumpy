@@ -14,7 +14,7 @@ GCNode* test_tostring(GCNode* _this_);
 GCNode* test_new(GCNode* _this_);
 void function_program();
 void function_throwfunc();
-jmp_buf exc_env_0, exc_env_1;
+jmp_buf exc_env_0;
 #define TYP_INT 100
 int exc_holder_int;
 #define TYP_LONG 101

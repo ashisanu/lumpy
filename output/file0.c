@@ -40,80 +40,80 @@ GCNode* test_tostring(GCNode* _this_) {
 	return newString("");
 	
 }
+
 GCNode* test_new(GCNode* _this_) {
 	return _this_;
 	
 }
+
 void function_program() {
 	//Line: 13
 	//begin try: ex
-	int jmp_env_1 = setjmp(exc_env_1);
-	if (jmp_env_1) {
-		if (jmp_env_1 == TYP_STRING) {
+	int jmp_env_0 = setjmp(exc_env_0);
+	if (jmp_env_0) {
+		if (jmp_env_0 == TYP_STRING) {
 			GCNode* _ex_ = exc_holder_obj;
 			{
-				//Line: 22
+				//Line: 18
 				print_string (joinstr(newString("exception: "), _ex_) );
 				
 			}
-		}
-		if (jmp_env_1 == TYP_INT) {
+			
+		} else if (jmp_env_0 == TYP_INT) {
 			int _ex_ = exc_holder_int;
 			{
-				//Line: 25
+				//Line: 21
 				print_string (joinstr(newString("eine int exceptioN"), int2string(_ex_)) );
 				
 			}
-		}
-		if (jmp_env_1 == TYP_TEST) {
+			
+		} else if (jmp_env_0 == TYP_TEST) {
 			GCNode* _ex_ = exc_holder_obj;
 			{
-				//Line: 28
+				//Line: 24
 				print_string (test_tostring (_ex_ ) );
 				
 			}
+			
+		} else {
+			//Line: 27
+			print_string (newString("wtf") );
+			
 		}
 		
 	} else {
-		stack_enter(0, newException(&exc_env_1, 3, TYP_STRING, TYP_INT, TYP_TEST));
+		stack_enter(0, newException(&exc_env_0, 4, TYP_STRING, TYP_INT, TYP_TEST, -1));
 		{
 			//Line: 14
-			//begin try: ex
-			int jmp_env_0 = setjmp(exc_env_0);
-			if (jmp_env_0) {
-				if (jmp_env_0 == TYP_TEST) {
-					GCNode* _ex_ = exc_holder_obj;
-					{
-						//Line: 18
-						print_string (test_tostring (_ex_ ) );
-						
-					}
-				}
-				
-			} else {
-				stack_enter(0, newException(&exc_env_0, 1, TYP_TEST));
-				{
-					//Line: 15
-					function_throwfunc ( );
-					
-				}
-				stack_leave();
+			function_throwfunc ( );
+			//Line: 15
+			finally:
+			{
+				//Line: 30
+				print_string (newString("ich werde immer ausgef�hrt") );
 				
 			}
-			//end try
-			;
+			return;
 			
 		}
+		
 		stack_leave();
 		
 	}
 	//end try
+	//finally:
+	{
+		//Line: 30
+		print_string (newString("ich werde immer ausgef�hrt") );
+		
+	}
 	;
 	return;
 	
 }
+
 void function_throwfunc() {
-	//Line: 36
+	//Line: 35
 	//throw: test_new (new_test() )
 	exc_holder_obj = test_new (new_test() );
 	throwException(TYP_TEST);
@@ -121,4 +121,5 @@ void function_throwfunc() {
 	return;
 	
 }
+
 

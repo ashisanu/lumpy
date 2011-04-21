@@ -10,12 +10,8 @@ end
 
 function program()
 	try ex
-		try ex
-			throwFunc
-		end
-		catch test
-			print ex.tostring()
-		end
+		throwFunc
+		return
 	end
 	catch string
 		print "exception: " + ex
@@ -28,6 +24,9 @@ function program()
 	end
 	catch
 		print "wtf"
+	end
+	finally
+		print "ich werde immer ausgeführt"
 	end
 end
 
