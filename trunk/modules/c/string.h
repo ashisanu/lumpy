@@ -1,3 +1,5 @@
+#ifndef STRING_FILE
+#define STRING_FILE
 GCNode* newString(char* str);
 int str_len(GCNode* node);
 int str_asc(GCNode* node);
@@ -24,3 +26,5 @@ GCNode* str_lower(GCNode* node);
 GCNode* str_replace(GCNode* str1, GCNode* str2, GCNode* str3, int start);
 GCNode* str_trim(GCNode* node);
 char* toCString(GCNode* node);
+int str_hash(GCNode* node);
+#endif

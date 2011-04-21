@@ -1,4 +1,5 @@
 #include "GC.h"
+#include <setjmp.h>
 
 //Node löschen
 void removeNode(GCNode* node) {
@@ -32,12 +33,13 @@ void GCDeInit() {
 }
 
 //Stack Manipulation
-void stack_enter(int size) { //size ist wieviele lokale variablen drinnen sind.
+void stack_enter(int size, ExceptionHolder* exception) { //size ist wieviele lokale variablen drinnen sind. exception: wohin gesprungen wird, bei einer exception
     //neuen stack pushen.
     GCFrame* frame = (GCFrame*)malloc(sizeof(GCFrame));
     frame->prev = currentFrame;
     frame->refs = (GCNode***)malloc(sizeof(GCNode) * size);
     frame->size = size;
+    frame->exception = exception;
 
 
     currentFrame = frame;
@@ -47,7 +49,8 @@ void stack_leave() {
     //stack wieder weg.
     GCFrame* frame = currentFrame->prev;
 
-    free(currentFrame->refs);
+    if (currentFrame -> exception != NULL) removeException(currentFrame -> exception);
+    free(currentFrame -> refs);
     free(currentFrame);
 
     currentFrame = frame;

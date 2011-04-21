@@ -1,3 +1,6 @@
+#include <setjmp.h>
+#include "exception.h"
+
 #ifndef NULL
 #define NULL (void*)0
 #endif
@@ -20,6 +23,7 @@ typedef struct gcframe {
     GCNode*** refs; //Alle Referenzen
     int size; // wieviele referenzen
     struct gcframe* prev; //Voriges Frame
+    ExceptionHolder* exception; //wohin gesprungen wird, bei einer exception
 } GCFrame;
 
 GCNode* currentNode; //Startnode
@@ -28,7 +32,7 @@ GCFrame* currentFrame;
 void GCInit();
 void GCDeInit();
 void gccollect();
-void stack_enter();
+void stack_enter(int size, ExceptionHolder* jmp);
 void stack_leave();
 void stack_create(GCNode** node, int pos);
 void standardTrace(GCNode* node);

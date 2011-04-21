@@ -226,4 +226,25 @@ public class ExpressionManagerC extends ExpressionManager {
     public ExpressionProperty getPropertyExpression(Property prop,ExpressionIdentifier self) {
         return new CExpressionProperty(getParser(),prop,self);
     }
+
+    /**
+     * INc/Dec in C
+     */
+    public ExpressionIncDec getIncDecExpression(ExpressionIdentifier var, boolean inc) {
+        return new CExpressionIncDec(getParser(),var,inc);
+    }
+
+    /**
+     * Try Expression
+     */
+    public ExpressionTry getTryExpression(ExpressionBlock mainBlock, LinkedList<ExpressionBlock> catches, LinkedList<Datatype> datas, ExpressionBlock finallyBlock, String variableName) {
+        return new CExpressionTry(getParser(), mainBlock,catches,datas,finallyBlock,variableName);
+    }
+
+    /**
+     * Throw Expression
+     */
+     public ExpressionThrow getThrowExpression(Expression expr) {
+         return new CExpressionThrow(getParser(),expr);
+     }
  }

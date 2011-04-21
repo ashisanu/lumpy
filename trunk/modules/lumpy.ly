@@ -2,15 +2,20 @@ language c
 	import "c/gc.o"
 	import "c/string.o"
 	import "c/lang.o"
+	import "c/exception.o"
+	
 	import "c/gc.h"
 	import "c/lang.h"
 	import "c/string.h"
+	import "c/exception.h"
 end
 
 extern
 	function gccollect:void() = "gccollect"
 	function intern_stringlength:int(str:string) = "str_len"
-	
+	function intern_stringmid:string(str:string, startPos:int, endPos:int) = "str_mid"
+	function intern_stringasc:int(str:string) = "str_asc"
+	function intern_stringhash:int(str:string) = "str_hash"
 	
 	function print:void(text:String) = "print_string"
 	function print:void(text:int) = "print_int"
@@ -23,19 +28,25 @@ extension string
 	function toString()
 		return this
 	end
-end
-
-extension int
-	function toString()
-		return string(this)
+	function hash:int()
+		var hash = intern_stringhash(this)
+		if hash < 0 
+			hash = hash * -1
+		end
+		
+		return hash
+	end
+	
+	function substring(startPos:int, len:int)
+		return intern_stringmid(this, startPos, len)
+	end
+	
+	function asc()
+		return intern_stringasc(this)
 	end
 end
 
-extension float
-	function toString()
-		return string(this)
-	end
-end
+
 
 class<datatype> listValueIterator
 	private var l:list<datatype>

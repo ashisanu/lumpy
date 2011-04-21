@@ -72,6 +72,7 @@ loop var i = 0 to 10 step 2 do
 	
 end
 
+
 loop var c in "Hallo Welt"
 	//loop in schleife
 end
@@ -94,15 +95,6 @@ class Array
 		end
 		yield break
 	end
-end
-
-print add(2,3) //5
-print add("Hallo"," Welt") //Hallo Welt
-print add(new objA(),new objB()) //Fehler, da objA und objB keinen + operator implementieren 
-
-//template für funktionen
-function<Datatype> add:Datatype(left:Datatype,right:datatype)
-	return generate + generate //die datentypen, welche rein kommen müssen alle "+" überladen
 end
 
 
@@ -187,21 +179,30 @@ function get(wtf)
 	wtf()
 end
 
-get({ print "lolo" }) // {} erzeugt automatisch eine anonyme funktion, welche den rückgabewert, nicht deklarierte variablen, werden automatisch als parameter behandelt
 
-
-var testi = {
-	print "lol: " + einParameter
-	return 20
-}
-
-/*
-	Wird umgewandelt zu:
-	var testi = func:int(einParameter:String)
-		...
-		return 20
+//anonyme klassen
+var klasse = {
+	public var xyz
+	
+	public function test123()
+		print "test123"
 	end
-*/
+	//hat keinen konstrukor
+	//public function new()
+	//end
+	
+}
+klasse.xyz = 10
+klasse.test123()
+
+function<Datentyp> duckTyping(var:datentyp)
+	var.test123()
+end
+
+duckTyping klasse //geht, da klasse test123 implementiert
+duckTyping<int> klasse //geht nicht, da klasse kein int ist, das <int> ist optional
+duckTyping {public function test123() end} //geht auch, da die anonyme klasse test123 implementiert
+duckTyping 10 //geht nicht, da "int" kein test123() implementiert.
 
 
 if 2+3*5-8 do

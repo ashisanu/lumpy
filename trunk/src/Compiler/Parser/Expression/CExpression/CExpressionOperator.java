@@ -29,6 +29,7 @@ public class CExpressionOperator extends ExpressionOperator {
                 if (n.equals("and")) n = "&&";
                 if (n.equals("or")) n = "||";
                 if (n.equals("xor")) n = " /* screw you, i must implement xor */";
+                if (n.equals("mod")) n = "%";
                 str += " "+n+" ";
                 str += getRight().generate();
                 str += ")";

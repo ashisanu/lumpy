@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
+
 #include "GC.h"
 #include "string.h"
 
@@ -286,4 +287,17 @@ GCNode* str_trim(GCNode* node) {
 		}
 	}
 	return str_mid(node,start,end-start+1);
+}
+
+int str_hash(GCNode* node) {
+    unsigned int hash = 0;
+    int c;
+    char* s = (char*)(node -> data);
+    while((c = *s++))
+    {
+        /* hash = hash * 33 ^ c */
+        hash = ((hash << 5) + hash) ^ c;
+    }
+
+    return hash;
 }
