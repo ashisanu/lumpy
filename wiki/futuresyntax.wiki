@@ -110,7 +110,7 @@ end
 {{{
 var array = new int[20]
 print array[..10] //creates a new array with first 10 elements
-print array[10..] //creates a new array with 10 - 49
+print array[10..] //creates a new array with 10 - 20
 print array[4 .. 6] //elements from 4 to 6
 print array[..-2] //last two elements
 print array[..] //creates a new copy
