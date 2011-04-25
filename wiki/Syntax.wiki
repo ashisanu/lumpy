@@ -10,11 +10,11 @@ Lumpy is case insensitive. That means, it does not matter if you type "iF","IF" 
 
 Lumpy only knows "private" and "public" for information hinding within classes. "private" acts like "protected" in Java. "public" acts like in java.
 
-Lumpy uses type inference. That means, you often (not always) need not to specify the datatype of a variable. Only in connection with templates,extern functions or metafunctions you HAVE TO. Sometimes the compiler can't find the datatype of a class attribute. 
+Lumpy uses type inference. That means, you often (not always) need not to specify the datatype of a variable. Only in connection with templates,extern functions or operators you HAVE TO. Sometimes the compiler can't find the datatype of a class attribute. 
 
 
 
-All features are fully working (except the "extern" statement.):
+All features are fully working:
 = Details =
 
 
@@ -246,7 +246,7 @@ extern
         end
     end
 end
-
+}}}
 
 
 == operator overloading ==
