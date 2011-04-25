@@ -240,9 +240,70 @@ extern
     function func:void(lol1:float,lol:string) //no type inference
     // does not work yet
     var test:int
-    class test //no inheritance allowed
-        public var test:int, lol:float  //only public
-        //no methods and constructor allowed.
+    struct test //no inheritance allowed
+        var test:int, lol:float  //only public
+        function method()
+        end
     end
 end
+
+
+
+== operator overloading ==
+Overloadable operators:
++,-,*,/,and,or,not,<,>,<=,>=,!=
+{{{
+operator <:boolean(left:String, Right:String)
+    return left.length < right.length
+end
+function program()
+    print "lol" < "rofl"
+end
+}}}
+
+
+
+== const ==
+{{{
+var const lol = 10
+lol = 100 //error
+}}}
+
+== call by reference ==
+{{{
+function swap(ref left:int, ref right:int)
+    var tmp = left
+    left = right
+    right = tmp
+end
+function program()
+    var i = 10, j = 20
+    swap i, j
+    print i //20
+    print j //10
+end
+}}}
+
+== default parameter values ==
+{{{
+function default(var1:int = 100, var2:string = "Hello") end
+function program()
+    default
+end
+}}}
+
+== slicing (Array)==
+{{{
+var array = new int[20]
+print array[..10] //creates a new array with first 10 elements
+print array[10..] //creates a new array with 10 - 20
+print array[4 .. 6] //elements from 4 to 6
+print array[..-2] //last two elements
+print array[..] //creates a new copy
+}}}
+
+== automatic array generation ==
+{{{
+var arr = [10,20,30,40,50]
+}}}
 }}}
