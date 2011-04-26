@@ -292,6 +292,27 @@ function program()
 end
 }}}
 
+== abstract/final ==
+abstract: It have to be extended.
+final: It mustn't be extended.
+{{{
+class abstract base
+	
+	public function new()
+	end
+	
+	public function abstract blub()
+end
+
+class extend < base
+	public function blub()
+		print "jahaaa"
+	end
+end
+}}}
+
+
+
 == slicing (Array)==
 {{{
 var array = new int[20]
@@ -306,4 +327,33 @@ print array[..] //creates a new copy
 {{{
 var arr = [10,20,30,40,50]
 }}}
+
+
+== Static members (singleton) ==
+{{{
+
+class test
+	public static var statisch:int = 99
+	
+	public static function test()
+		print "ROFL"
+	end
+	
+	public static property name
+		get
+			return "Peter"
+		end
+		set
+			print "set name: " + value
+		end
+	end
+	
+	public static generator:int()
+		var i = 2
+		loop true
+			i = i*2
+			yield return i
+		end
+	end
+end
 }}}
