@@ -8,8 +8,9 @@ What concepts does Lumpy use?
 = Details =
 
  * KISS: Keep It Simple, Stupid
- * Do what you want 'cause a pirate is free: You can do everything with lumpy you want.
+ * Do what you want 'cause a pirate is free(new conecept, afaik): You can do everything with lumpy you want. There are no limitations.
+ * KICK (Keep It Consequent, Kid, new concept): In Lumpy everything should be done the same way.
  * Objectoriented programming
  * Dataflow based programming
- * imperative programming
- * generic programming 
+ * Imperative programming
+ * Generic programming 
