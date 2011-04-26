@@ -23,13 +23,5 @@ Lumpy uses a "milestone system". Every milestone is an important point in the de
    # System
    # IO System
  * Milestone 5: Simple IDE
- * Milestone 6: New platform: HTML5 (Java Script) with Libraries:
-    # Graphics
-    # Keyboard/Mouse
-    # Sound
-    # System
-    # IO System
- * Milestone 7: New platform: GP2X Wiz and Open Pandora with all Libraries (except GUI for GP2X Wiz).
- * Milestone 8: Fixing bugs bugs bugs and more bugs.
-
-
+ * Milestone 6: New platform: GP2X Wiz and Open Pandora with all Libraries (except GUI for GP2X Wiz).
+ * Milestone 7: Fixing bugs bugs bugs and more bugs.
