@@ -46,6 +46,13 @@ Grundsätzlich sind Virtuelle Maschinen _immer_ langsamer als direkt kompilierte
 
 CIL ist wiederum Microsoft abhängig (und Mono ist auch nicht so das gelbe vom Ei) und die JavaVM ist vergleichsweise langsam.
 
+= KICK - Keep It Consequent, Kid =
+KICK ist ein eigenes Konzept. KICK bedeutet, dass in Lumppy alles gleich funktionieren soll. JEDE Schleife wird mit "loop" eingeleitet. JEDE Funktion (egal ob Methode oder Funktion) wird mit "function" eingeleitet. JEDE Variable (Egal ob Attribut, Lokal oder Global) wird mit "var" eingeleitet.
+Außerdem gibt es kaum optionale Sprachelemente. Das einzig Optionale Sprachkonstrukt ist der "Step" Parameter beim for - loop.
+
+Dies lässt sich noch weiter auslegen, aber ich glaube es wird damit klar was ich hiermit versuche zu erklären.
+Frei nach dem Motto "There is only one way to program".
+
 = Was bedeutet das nun für Sie? =
 
 Die oben angeführten Kriterien für eine Programmiersprache sind natürlich stark subjektiv. Jedoch glaube ich, dass ich nicht der Einzige bin, der so denkt.
