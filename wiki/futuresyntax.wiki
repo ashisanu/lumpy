@@ -7,20 +7,6 @@ Lumpy will contain more features. Such as namespaces, data flow based programmin
 
 = Details =
 
-== namespace ==
-{{{
-namespace std
-    class test
-        public function new() end
-    end
-end
-namespace program
-    function program()
-        var test = new std.test()
-    end
-end
-}}}
-
 
 == flow based programming ==
 {{{
