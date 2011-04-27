@@ -5,6 +5,7 @@ import Compiler.*;
 import Compiler.Class;
 import Compiler.Parser.Expression.*;
 import Compiler.Parser.Expression.CExpression.CExpressionAssignment;
+import Compiler.Parser.Expression.CExpression.CExpressionAutoArray;
 import Compiler.Parser.Expression.CExpression.CExpressionNew;
 import Compiler.Parser.Expression.CExpression.CExpressionTry;
 import java.io.BufferedWriter;
@@ -19,11 +20,13 @@ import lumpy.Main;
  * @author Coolo
  */
 public class CParser extends Parser {
+    private static String initStatics = "";
     private String headerCode = "";
     private String functionCode = "";
     private String importCode = "";
     private String template;
     private Import myImport;
+    private LinkedList<CExpressionAutoArray> autoArrs = new LinkedList<CExpressionAutoArray>();
     
     public CParser(Lexer analyser, ExpressionManager man, String filePath) throws SyntaxException {
         super(analyser,man,filePath);
@@ -53,19 +56,25 @@ public class CParser extends Parser {
         headerCode += "#endif"+newLine();
         //klassen definieren
         for (Class c: getClasses()) {
-            if (c.getTyp() != Class.IS_EXTENSION) {
+            if (c.getTyp() == Class.IS_CLASS) {
+                String staticMem = "";
                 headerCode += "#define TYP_"+c.getName().toUpperCase()+" "+c.getUnsafeID()+newLine();
                 identUp();
                 headerCode += "typedef struct __"+c.getName()+"__ {"+newLine();
                 if (c.getInherit() != null) {
                     headerCode +="//Inherit from: "+c.getInherit().getName()+newLine();
                 }
-                //headerCode += "VFunction* vtable;"+newLine();
                 headerCode += "int typid;"+newLine();
                 headerCode += "int superclass;"+newLine();
                 for (Variable attribute: c.getAttibutes()) {
                     if (attribute.isUsed()) {
-                        headerCode += CExpressionAssignment.getDatatype(attribute.getDatatype())+" _"+attribute.getName()+"_;"+newLine();
+                        if (!attribute.isStatic()) {
+                            headerCode += CExpressionAssignment.getDatatype(attribute.getDatatype())+" _"+attribute.getName()+"_;"+newLine();
+                        } else {
+                            identDown();
+                            staticMem += CExpressionAssignment.getDatatype(attribute.getDatatype())+" __static__"+c.getName()+"__"+attribute.getName()+"_;"+newLine();
+                            identUp();
+                        }
                     }
                 }
 
@@ -73,20 +82,10 @@ public class CParser extends Parser {
 
                 headerCode += newLine();
                 headerCode += "} "+c.getName()+";"+newLine();
+                headerCode += staticMem;
 
                 headerCode += "GCNode* cast2"+c.getName()+"(GCNode* node);"+newLine();
-                /*
-                functionCode += "VFunction vtable_"+c.getName()+"[] = {";
-                boolean start = false;
-                for (Function func: c.getMethods()) {
-                    if (start) functionCode += ", ";
-
-                    functionCode += "(VFunction)"+func.generateFuncName();
-
-                    start = true;
-                }
-                functionCode += "};"+newLine();*/
-
+                
                 identUp();
                 functionCode += "GCNode* cast2"+c.getName()+"(GCNode* node) {"+newLine();
                 functionCode += "";
@@ -119,7 +118,11 @@ public class CParser extends Parser {
                             } else {
                                 init = dec.getValues().get(i).generate();
                             }
-                            if (att.isUsed()) functionCode += "(("+c.toString()+"*)obj -> data) -> "+CExpressionAssignment.getAccess(att)+" = " + init+ ";"+newLine();
+                            if (att.isStatic()) {
+                                initStatics += "__static__"+c.getName()+"__"+att.getName()+"_ = "+init+";"+newLine();
+                            } else {
+                                if (att.isUsed()) functionCode += "(("+c.toString()+"*)obj -> data) -> "+CExpressionAssignment.getAccess(att)+" = " + init+ ";"+newLine();
+                            }
                             i++;
                         }
                     }
@@ -132,7 +135,15 @@ public class CParser extends Parser {
 
                 functionCode += "}"+newLine();
 
-                headerCode +="GCNode* new_"+c.getName()+"();"+newLine();
+                headerCode += "GCNode* new_"+c.getName()+"();"+newLine();
+            } else if (c.getTyp() == Class.IS_STRUCT) {
+                //sehr einfacher konstruktor
+                headerCode   += "GCNode* new_"+c.getName()+"();"+newLine();
+                identUp();
+                functionCode += "GCNode* new_"+c.getName()+"() {"+newLine();
+                identDown();
+                functionCode += "return gc_malloc(sizeof("+c.getName()+"), &standardTrace);"+newLine();
+                functionCode += "}"+newLine();
             }
         }
 
@@ -179,15 +190,15 @@ public class CParser extends Parser {
                     if (func instanceof CodeFunction) {
                         CodeFunction cfunc = (CodeFunction)func;
 
-                        if (cfunc.getScope().getOwnerClass() != null) {
-                            headerCode += CExpressionAssignment.getDatatype(cfunc.getScope().getOwnerClass())+" _this_";
+                        if (cfunc.getScope().getOwnerClass() != null && !cfunc.isStatic()) {
+                            headerCode += CExpressionAssignment.getDatatype(new Datatype(Datatype.Name2Int(cfunc.getScope().getOwnerClass().getName()),0,null))+" _this_";
                             start = true;
                         }
 
                     }
                     for (Variable param: func.getParameter()) {
                         if (start) headerCode += ", ";
-                        headerCode += CExpressionAssignment.getDatatype(param.getDatatype())+" "+param.getName();
+                        headerCode += CExpressionAssignment.getDatatype(param)+" "+param.getName();
 
                         start = true;
                     }
@@ -195,16 +206,53 @@ public class CParser extends Parser {
                 }
             }
         }
-        
+        for (CExpressionAutoArray arr: autoArrs) {
+            try {
+                String proto = "GCNode* genAutoArray_"+CExpressionAssignment.getRealDatatype(arr.getDatatype()).replace("*", "_dim")+"(int size,...)";
+                headerCode += proto+";"+newLine();
+
+                identUp();
+                functionCode += proto + " {"+newLine();
+                functionCode += "va_list args;"+newLine();
+                functionCode += "va_start(args, size);"+newLine();
+                String typ = CExpressionAssignment.getDatatype(new Datatype(arr.getDatatype().getUnsafeID(),arr.getDatatype().getDimensions() -1 ,null));
+                functionCode += "GCNode* tmp = gc_malloc(sizeof(" + typ + ") * size, &standardTrace);"+newLine();
+                functionCode += "int i;"+newLine();
+                identUp();
+                functionCode += "for (i = 0; i < size; i++) {"+newLine();
+                functionCode += "((" + typ + "*)tmp -> data)[i] = va_arg(args, "+typ+");"+newLine();
+                identDown();
+                functionCode += newLine() + "}"+newLine();
+
+                functionCode += "va_end (args);"+newLine();
+                functionCode += "return tmp;";
+                identDown();
+                functionCode += newLine() + "}" + newLine();
+            } catch (SyntaxException ex) {
+                System.err.println("Something went really wrong...");
+            }
+        }
         //Nun die fehlenden Array Initalasatoren implementieren
         if (isMain) {
+            headerCode += "void initStatic();"+newLine();
+
+            identUp();
+            functionCode += "void initStatic() {"+newLine();
+            functionCode += initStatics;
+            identDown();
+            functionCode += newLine();
+            functionCode += "}"+newLine();
+
             for (int i = 1; i<=CExpressionNew.maxArraySize;i++) {
                 String head = "";
                 head += "GCNode* allocarray_"+i+"_(int size";
+                String all = "";
                 for (int j = 0; j<i;j++) {
                     head += ", int param"+j;
+                    all += "param"+j+"*";
                 }
                 head += ")";
+                all += "1";
 
                 headerCode += head+";"+newLine();
 
@@ -232,6 +280,7 @@ public class CParser extends Parser {
                 }
                 functionCode += "GCNode* node = gc_malloc(0,&standardTrace);"+newLine();
                 functionCode += "node -> data = arr;"+newLine();
+                functionCode += "node -> size = "+all+";"+newLine();;
                 functionCode += "return node;"+newLine();
                 identDown();
                 functionCode += newLine();
@@ -239,13 +288,16 @@ public class CParser extends Parser {
                 functionCode += newLine();
             }
         }
+        
         if (isMain) {
             if (CExpressionTry.TRYCOUNT > 0) headerCode += "jmp_buf ";
             for (int i = 0; i<CExpressionTry.TRYCOUNT;i++) {
                 if (i != 0) headerCode += ", ";
                 headerCode += "exc_env_"+i;
             }
+        }
             if (CExpressionTry.TRYCOUNT > 0) headerCode += ";"+newLine();
+            /*
             //defines für die datentypen definieren
             for (int i = 100; i < 120; i++) {
                 Datatype data = new Datatype(i,0,null);
@@ -256,7 +308,8 @@ public class CParser extends Parser {
                     headerCode += CExpressionAssignment.getDatatype(data)+" exc_holder_"+name+";"+newLine();
                 }
             }
-        }
+        }*/
+        
         /*
         for (Import imp: getImports()) {
             if (imp.getPath().endsWith("ly")) {
@@ -283,6 +336,18 @@ public class CParser extends Parser {
         //headerCode += "#endif"+newLine();
     }
 
+    public void addAutoArray(CExpressionAutoArray arr) {
+        try {
+            for (CExpressionAutoArray a: autoArrs) {
+                if (a.getDatatype().match(arr.getDatatype())) {
+                    return;
+                }
+            }
+            autoArrs.add(arr);
+        } catch (SyntaxException ex) {
+            
+        }
+    }
 
     public void backend() {
         try {
@@ -295,7 +360,7 @@ public class CParser extends Parser {
             writer.close();
 
             String userDir = System.getProperty("user.dir");
-            String command = "gcc -c "+userDir+"/output/file"+myImport.getID()+".c";
+            String command = userDir + "/compilers/c/bin/gcc.exe -c "+userDir+"/output/file"+myImport.getID()+".c";
             
             InputStream strm = Runtime.getRuntime().exec(command).getErrorStream();
             int i = 0;
@@ -319,8 +384,7 @@ public class CParser extends Parser {
                 else if (imp.getPath().endsWith("o"))
                     links += "\""+imp.getPath()+"\" ";
             }
-            String command = "gcc -O3 -o \"program.exe\" "+links;
-            System.out.println(command);
+            String command = userDir + "/compilers/c/bin/gcc.exe -O3 -o \"program.exe\" "+links;
             System.out.println(command);
             InputStream strm = Runtime.getRuntime().exec(command).getErrorStream();
             int i = 0;

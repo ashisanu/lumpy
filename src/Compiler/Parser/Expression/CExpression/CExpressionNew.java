@@ -13,7 +13,7 @@ import java.util.LinkedList;
  */
 public class CExpressionNew extends ExpressionNew {
     public static int maxArraySize = 0;
-    public CExpressionNew(Parser p, Datatype data) {
+    public CExpressionNew(Parser p, Datatype data) throws SyntaxException {
         super(p,data);
     }
     public CExpressionNew(Parser p, Datatype data, LinkedList<Expression> exprs) {

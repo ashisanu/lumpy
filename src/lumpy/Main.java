@@ -54,11 +54,11 @@ public class Main {
 
                 mainParser.execute();
             } else {
-                throw new SyntaxException("",null);
+                throw new SyntaxException("",null,false);
             }
         } catch (SyntaxException ex) {
             System.out.println(ex.genError());
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
     }
 

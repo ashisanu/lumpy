@@ -7,7 +7,7 @@ import Compiler.Parser.Parser;
  * Eine 1 Bit Ganzzahl
  * @author Coolo
  */
-public abstract class ExpressionBoolean extends Expression {
+public abstract class ExpressionBoolean extends ExpressionIdentifier {
     private boolean number;
     /**
      * Konstruktor

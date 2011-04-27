@@ -31,12 +31,10 @@ public class Scope {
      * @return
      */
     public boolean varExist(String name) {
-        if (variables.get(name) != null) return true;
-        if (superScope != null && superScope.getOwnerClass() == null) {
-            return superScope.varExist(name);
-        } else {
+        if (variables.get(name) != null)
+            return true;
+        else
             return false;
-        }
     }
     /**
      * Erstellt eine neue Variable
@@ -45,7 +43,7 @@ public class Scope {
      */
     public void newVariable(Variable var) throws SyntaxException {
         if (varExist(var.getName())) {
-            parser.error("Variable '"+var.getName()+"' already exist");
+            parser.error("Variable '"+var.getName()+"' already exists");
         }
         //schauen ob eine variable mit diesem namen bereits existiert
         for (Function func: getFunctions()) {

@@ -126,7 +126,7 @@ public class ExpressionManagerC extends ExpressionManager {
     /**
      * new
      */
-    public ExpressionNew getNewExpression(Datatype data) {
+    public ExpressionNew getNewExpression(Datatype data) throws SyntaxException {
         return new CExpressionNew(getParser(), data);
     }
     public ExpressionNew getNewExpression(Datatype data, LinkedList<Expression> expr) {
@@ -247,4 +247,28 @@ public class ExpressionManagerC extends ExpressionManager {
      public ExpressionThrow getThrowExpression(Expression expr) {
          return new CExpressionThrow(getParser(),expr);
      }
+
+     /**
+      * Ein automatisch erzeugtes Array in C
+      */
+    public ExpressionAutoArray getAutoArrayExpression(LinkedList<Expression> exprs) throws SyntaxException {
+        return new CExpressionAutoArray(getParser(), exprs);
+    }
+    /**
+     * Statischer Zugriff in C
+     */
+    public ExpressionStaticAccess getStaticAccessExpression(Class c) {
+        return new CExpressionStaticAccess(getParser(), c);
+    }
+    /**
+     * Slicing in C
+     * @param self
+     * @param start
+     * @param end
+     * @return
+     */
+    public ExpressionSlice getSliceExpression(ExpressionIdentifier self, Expression start, Expression end) throws SyntaxException {
+        return new CExpressionSlice(getParser(), self, start, end);
+    }
+
  }

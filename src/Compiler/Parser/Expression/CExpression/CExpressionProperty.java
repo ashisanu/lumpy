@@ -19,14 +19,21 @@ public class CExpressionProperty extends ExpressionProperty {
     public String generate() {
         String str = "";
         String indexer = "";
+        boolean start = true;
         for (Expression expr: super.indexer) {
-            indexer += ", ";
+            if (start) indexer += ", ";
             indexer += expr.generate();
+            start = true;
+        }
+        String me = self.generate();
+        if (prop.isStatic()) {
+            me = "";
         }
         if (value != null) {
-            str += prop.getSet().generateFuncName()+"("+self.generate()+", "+value.generate()+indexer+")";
+            if (!me.equals("")) me += ",";
+            str += prop.getSet().generateFuncName()+"("+me+value.generate()+indexer+")";
         } else {
-            str += prop.getGet().generateFuncName()+"("+self.generate()+indexer+")";
+            str += prop.getGet().generateFuncName()+"("+me+indexer+")";
         }
         return str;
     }

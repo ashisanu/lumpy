@@ -17,7 +17,8 @@ public class CExpressionSimpleFor extends ExpressionSimpleFor {
 
     @Override
     public String generate() {
-        String str = "";
+        getParser().identUp();
+        String str = "{"+getParser().newLine();
         String tmp = init.generate();
         str += tmp+";"+getParser().newLine();
 
@@ -30,6 +31,8 @@ public class CExpressionSimpleFor extends ExpressionSimpleFor {
         str += block.generate()+getParser().newLine();
         getParser().identDown();
         str += v+" = "+v+" + "+increment.generate()+";"+getParser().newLine();
+        getParser().identDown();
+        str += "}"+getParser().newLine();
         str += "}";
         return str;
     }

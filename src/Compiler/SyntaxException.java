@@ -7,15 +7,17 @@ public class SyntaxException extends Exception {
     public static boolean wasError = false;
     private String text;
     private Token token;
+    private boolean duck;
 
     /**
      * Erstellt eine neue Syntax Exception.
      * @param text
      * @param token
      */
-    public SyntaxException(String text, Token token) {
+    public SyntaxException(String text, Token token, boolean duck) {
         this.text = text;
         this.token = token;
+        this.duck = duck;
     }
 
     public String toString() {
@@ -42,5 +44,19 @@ public class SyntaxException extends Exception {
      */
     public String getText() {
         return text;
+    }
+
+    /**
+     * Ist es ein ducktype?
+     */
+    public boolean isDuck() {
+        return duck;
+    }
+
+    /**
+     * Setzt es als Ducktype
+     */
+    public void setDuck() {
+        this.duck = true;
     }
 }

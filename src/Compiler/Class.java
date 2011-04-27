@@ -12,18 +12,26 @@ public class Class extends Datatype {
     public static final int IS_CLASS = 0;
     public static final int IS_EXTENSION = 1;
     public static final int IS_STRUCT = 2;
+
+    public static final int IS_NORMAL = 0;
+    public static final int IS_ABSTRACT = 1;
+    public static final int IS_FINAL = 2;
+            
     public static int classID = 1000;
     private LinkedList<Variable> attribute;
     private LinkedList<Function> methods;
     private LinkedList<Property> propertys;
     private LinkedList<ExpressionDeclaration> startDecs;
     private LinkedList<Class> inheriting;
+    private Property mainProp;
     private Token startToken;
     private HashMap<String, String> replacer;
     private Scope scope;
     private Class inherit;
     private Parser parser; //in welchem parser wurde es definiert
-    private int typ = 0;
+    private int typ = 0; //der typ, ob klasse, struct oder extension
+    private String synonym;
+    private int mode = IS_NORMAL; //final oder abstract
 
 
     /**
@@ -40,33 +48,47 @@ public class Class extends Datatype {
         this.name = name;
         this.startToken = tok;
         this.parser = p;
+        this.synonym = name;
+        mainProp = null;
     }
 
     /**
      * Neues Property
      * @param prp
      */
-    public void newProperty(Property prp) {
+    public void newProperty(Property prp, boolean isStatic) {
         propertys.add(prp);
-        
+        prp.setStatic(isStatic);
     }
 
+    /**
+     * Sas Hauptproperty (this)
+     */
+    public void setProperty(Property prp) {
+        mainProp = prp;
+    }
+
+    public Property getProperty() {
+        return mainProp;
+    }
     /**
      * Neues Attribut
      * @param isPublic
      * @param var
      */
-    public void newAttribute(boolean isPublic, Variable var) {
+    public void newAttribute(boolean isPublic, Variable var, boolean isStatic) {
         attribute.add(var);
         var.setPublic(isPublic);
+        var.setStatic(isStatic);
     }
     /**
      * Neue Methode
      * @param isPublic
      * @param func
      */
-    public void newMethod(boolean isPublic, Function func,Variable thisVar, Variable superVar) throws SyntaxException {
+    public void newMethod(boolean isPublic, Function func,Variable thisVar, Variable superVar, boolean isStatic) throws SyntaxException {
         methods.add(func);
+        func.setStatic(isStatic);
         func.setPublic(isPublic);
         func.notCallable();
 
@@ -80,11 +102,22 @@ public class Class extends Datatype {
                 cfunc.setTyp(CodeFunction.IS_METHOD);
             }
 
-            cfunc.getScope().setClass(this);
+            //schauen ob es eine finale methode überschreibt
+            if (!isStatic) {
+                for (Function f: getMethods()) {
+                    if (f.match(cfunc) && f != cfunc) {
+                        if (((CodeFunction)f).getMode() == Class.IS_FINAL) {
+                            parser.error("Cannot overload a final method: "+f.getName());
+                        }
+                    }
+                }
+            }
+
+            if (!isStatic) cfunc.getScope().setClass(this);
             cfunc.setSynonym(getName()+"_"+cfunc.getName());
 
             
-            cfunc.getScope().newVariable(thisVar);
+            if (!isStatic) cfunc.getScope().newVariable(thisVar);
 
             
             if (this.getInherit() != null) cfunc.getScope().newVariable(superVar);
@@ -153,9 +186,13 @@ public class Class extends Datatype {
     /**
      * Vererbt von der Klasse
      */
-    public void inherits(Class c) {
+    public void inherits(Class c) throws SyntaxException {
         c.inheriting.add(this);
         this.inherit = c;
+
+        if (c.getMode() == IS_FINAL) {
+            getParser().error("Cannot inherit from final class '"+c.getName()+"'");
+        }
     }
 
     /**
@@ -209,5 +246,26 @@ public class Class extends Datatype {
      */
     public int getTyp() {
         return typ;
+    }
+
+    /**
+     * Synonym
+     */
+    public void setSynonym(String syn) {
+        this.synonym = syn;
+    }
+
+    /**
+     * modus (final, abstract, normal)
+     */
+    public void setMode(int m) {
+        this.mode = m;
+    }
+
+    /**
+     * gibt den modus zurück
+     */
+    public int getMode() {
+        return mode;
     }
 }

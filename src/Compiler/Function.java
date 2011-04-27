@@ -1,5 +1,7 @@
 package Compiler;
 import Compiler.Parser.Expression.Expression;
+import Compiler.Parser.Expression.ExpressionEmpty;
+import Compiler.Parser.Parser;
 import java.util.*;
 /**
  * Eine festdefinierte Funktion. Diese Funktion hat einen eindeutigen globalen Namen
@@ -29,10 +31,19 @@ public class Function extends Variable {
      * @param name der name des parameters
      * @param data der datentyp des parameters
      */
-    public Variable newParameter(String name, Datatype data) {
+    public Variable newParameter(Parser p, String name, Datatype data, Expression expr) throws SyntaxException {
         Variable var = new Variable(name,data);
         var.setSynonym("param_"+parameters.size());
+        var.setOptional(expr);
         parameters.add(var);
+
+        if (expr != null) {
+            if (var.getDatatype().match(expr.getDatatype())) {
+                var.setDatatype(expr.getDatatype());
+            } else {
+               p.error(var.getDatatype().generateErrorMsg(expr.getDatatype()));
+            }
+        }
 
         return var;
     }
@@ -43,25 +54,85 @@ public class Function extends Variable {
     public String getName() {
         return name;
     }
+
+    /**
+     * überprüft auf gleichheit
+     */
+    public boolean match(Function func) {
+        if (func.getName().equals(getName())) {
+            if (func.getParameter().size() == getParameter().size()) {
+                int i = 0;
+                for (Variable v: func.getParameter()) {
+                    if (v.getDatatype() != null && getParameter().get(i).getDatatype() != null && !v.getDatatype().match(getParameter().get(i).getDatatype())) return false;
+                    i++;
+                }
+            } else return false;
+        } else return false;
+        return true;
+    }
+
     /**
      * Schaut ob die gegebenen Informationen reichen, dass die Funktion gerufen werden kann
      */
     public boolean match(String name, LinkedList<Expression> parameters) throws SyntaxException {
         if (getName().equals(name) && parameters.size() == this.parameters.size()) {
-            int i = 0;            
+            int i = 0;
+            boolean noFind = false;
             for (Expression par:parameters) {
                 Datatype data = this.parameters.get(i).getDatatype();
-                
                 if (par.getDatatype() != null && !par.getDatatype().match(data) && !(data.isClass() && par.getDatatype().isNull())) {
-                    return false;
+                    noFind = true;
+                    break;
                 }
                 i++;
             }
             
-            return true;
-        } else {
-            return false;
+            if (!noFind) return true;
         }
+        
+        if (parameters.size() <= this.parameters.size()) {
+            int i = 0;
+            for (Expression par:parameters) {
+                if (!(par instanceof ExpressionEmpty)) {
+                    Datatype data = this.parameters.get(i).getDatatype();
+
+                    if (par.getDatatype() != null && !par.getDatatype().match(data) && !(data.isClass() && par.getDatatype().isNull())) {
+                        return false;
+                    }
+                } else {
+                    if (this.parameters.get(i).getOptional() == null) {
+                        return false;
+                    }
+                }
+                i++;
+            }
+            if (this.parameters.size() >= parameters.size()) {
+                LinkedList<Expression> oldParameters = (LinkedList<Expression>)parameters.clone();
+                parameters.clear();
+                i = 0;
+                for (Expression expr: oldParameters) {
+                    if (expr instanceof ExpressionEmpty) {
+                        parameters.add(this.parameters.get(i).getOptional());
+                    } else {
+                        parameters.add(expr);
+                    }
+                    i++;
+                }
+                for (;i < this.parameters.size();i++) {
+                    if (this.parameters.get(i).getOptional() != null) {
+                        parameters.add(this.parameters.get(i).getOptional());
+                    } else {
+                        parameters.clear();
+                        parameters.addAll(oldParameters);
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
     /**
      * Generiert den Namen (anhand den parametern) => name juggling
@@ -132,4 +203,13 @@ public class Function extends Variable {
     public void compile() {
         this.compiled = true;
     }
+
+
+    /**
+     * Doch nicht kompiliert
+     */
+    public void notCompiled() {
+        this.compiled = false;
+    }
+    
 }

@@ -35,7 +35,11 @@ public class CExpressionDeclaration extends ExpressionDeclaration {
                     str += CExpressionAssignment.getDatatype(var.getDatatype())+" ";
                 } else if (c != null) {
                     String datatype = c.toString()+"*";
-                    str += "(("+datatype+")_this_ -> data) ->";
+                    if (var.isStatic()) {
+                        str += "__static__"+c.getName()+"_";
+                    } else {
+                        str += "(("+datatype+")_this_ -> data) ->";
+                    }
                 }
                 str += CExpressionAssignment.getAccess(var);
                 if (!(expr instanceof ExpressionEmpty) && expr != null) {

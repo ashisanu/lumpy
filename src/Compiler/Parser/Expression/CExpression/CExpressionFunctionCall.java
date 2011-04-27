@@ -21,10 +21,19 @@ public class CExpressionFunctionCall extends ExpressionFunctionCall {
         String str = getFunction().generateFuncName();
         str += " (";
         boolean start = false;
+        int i = 0;
+        if (getFunction() instanceof CodeFunction && ((CodeFunction)getFunction()).getScope().getOwnerClass() != null && !getFunction().isStatic()) {
+            i = -1;
+        }
         for (Expression par: getParameter()) {
+            if (!start && getFunction().isStatic()) continue;
             if (start) str += ", ";
+            if (i>=0 && getFunction().getParameter().get(i).isReference()) {
+                str += "&";
+            }
             str += par.generate();
             start = true;
+            i++;
         }
         str += " )";
         return str;

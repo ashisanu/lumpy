@@ -1,13 +1,18 @@
 language c
-	import "c/gc.o"
-	import "c/string.o"
-	import "c/lang.o"
-	import "c/exception.o"
+	import "c/system/gc.o"
+	import "c/system/string.o"
+	import "c/system/lang.o"
+	import "c/system/exception.o"
+	import "c/system/slice.o"
 	
-	import "c/gc.h"
-	import "c/lang.h"
-	import "c/string.h"
-	import "c/exception.h"
+	import "c/system/gc.h"
+	import "c/system/lang.h"
+	import "c/system/string.h"
+	import "c/system/exception.h"
+	import "c/system/slice.h"
+	
+	//gui
+	import "c/gui/gui.h"
 end
 
 extern
@@ -19,6 +24,22 @@ extern
 	
 	function print:void(text:String) = "print_string"
 	function print:void(text:int) = "print_int"
+end
+
+class abstract object
+	public function toString:string()
+		return "object"
+	end
+	
+	public function compare(Other:Object)
+		return 0
+	end
+end
+
+extension int
+	function toString()
+		return string(this)
+	end
 end
 
 extension string
@@ -44,6 +65,65 @@ extension string
 	function asc()
 		return intern_stringasc(this)
 	end
+end
+
+class abstract exception
+	private var _name = ""
+	
+	public property name
+		get
+			return this._name
+		end
+	end
+	
+	public function toString()
+		return "Exception thrown '" + this.name+"'"
+	end
+	
+	public function new(name)
+			this._name = name
+	end
+end
+
+class final NullPointerException < exception
+	public function new()
+		this._name = "Null Pointer"
+	end
+	
+	private static var forceCreate = new NullPointerException //den "compile on demand" parser austricken :>, da dieser sonst keine instanz von NullPointerException kompilieren würde.
+
+end
+
+function throwNullPointerException() = "throwNullPointer" force
+	throw new NullPointerException
+end
+
+class final InvalidSliceOperationException < exception
+	public function new()
+		this._name = "Invalid Slice Operation"
+	end
+	
+	
+	private static var forceCreate = new InvalidSliceOperationException
+		
+end
+
+function throwSliceException() = "throwSliceException" force
+	throw new InvalidSliceOperationException
+end
+
+
+class final OutOfMemoryException < exception
+	public function new()
+		this._name = "Out Of Memory"
+	end
+	
+	private static var forceCreate = new OutOfMemoryException
+	
+end
+
+function throwOutOfMemoryException() = "throwOutOfMemory" force
+	throw new OutOfMemoryException
 end
 
 

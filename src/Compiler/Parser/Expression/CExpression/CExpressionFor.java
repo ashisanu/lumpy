@@ -17,10 +17,13 @@ public class CExpressionFor extends ExpressionFor {
 
     @Override
     public String generate() {
-        String str = "";
+        getParser().identUp();
+        String str = "{"+getParser().newLine();
         str += init.generate()+";"+getParser().newLine();
         str += "for(;"+cond.generate()+";"+increment.generate()+") ";
         str += block.generate();
+        getParser().identDown();
+        str += getParser().newLine() + "}" + getParser().newLine();
         return str;
     }
 }
