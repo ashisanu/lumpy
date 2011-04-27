@@ -2,7 +2,9 @@
 
 = Introduction =
 
-Lumpy will contain more features. Such as namespaces, data flow based programming and much more.
+Lumpy will contain more features. Such as operator overloading, data flow based programming and much more.
+
+EDIT: WHOA, There is only one feature left \o/.
 
 
 = Details =
