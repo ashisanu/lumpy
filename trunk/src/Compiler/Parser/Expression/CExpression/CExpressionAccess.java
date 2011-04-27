@@ -3,6 +3,7 @@ package Compiler.Parser.Expression.CExpression;
 import Compiler.Parser.Expression.ExpressionAccess;
 import Compiler.Parser.Expression.ExpressionFunctionCall;
 import Compiler.Parser.Expression.ExpressionIdentifier;
+import Compiler.Parser.Expression.ExpressionStaticAccess;
 import Compiler.Parser.Parser;
 import Compiler.SyntaxException;
 
@@ -25,6 +26,8 @@ public class CExpressionAccess extends ExpressionAccess {
                     ExpressionFunctionCall call = (ExpressionFunctionCall)right;
                     if (call.getParameter().size()==0 || call.getParameter().getFirst() != left) call.getParameter().addFirst(left);
                     return right.generate();
+                } else if (left instanceof ExpressionStaticAccess) {
+                    return left.generate()+"_" + right.generate();
                 } else {
                     String datatype = left.getDatatype().toString();
                     if (left.getDatatype().isClass()) datatype += "*";

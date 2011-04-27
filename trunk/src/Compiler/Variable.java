@@ -1,5 +1,6 @@
 package Compiler;
 
+import Compiler.Parser.Expression.Expression;
 import java.util.LinkedList;
 
 /**
@@ -7,6 +8,7 @@ import java.util.LinkedList;
  * @author Coolo
  */
 public class Variable {
+    private static int maxid = 0;
     private static LinkedList<Variable> variables = new LinkedList<Variable>();
     public static LinkedList<Variable> getVariables() {
         return variables;
@@ -17,8 +19,12 @@ public class Variable {
     protected Datatype datatype;
     protected boolean isPub = true;
     protected String synonym;
+    private boolean isStatic = false;
+    private boolean ref = false;
     private boolean used = false;
-
+    private boolean isConst = false;
+    private int id = 0;
+    private Expression optional = null;
 
     /**
      * Konstruktor
@@ -27,6 +33,8 @@ public class Variable {
         this.name = name;
         this.datatype = datatype;
         this.synonym = name;
+        this.id = maxid;
+        maxid++;
     }
 
     /**
@@ -98,5 +106,76 @@ public class Variable {
      */
     public String getSynonym() {
         return synonym;
+    }
+
+    /**
+     * Konstante
+     *
+     */
+    public void setConstant() {
+        isConst = true;
+    }
+    /**
+     * ist es konstant?
+     */
+    public boolean isConstant() {
+        return isConst;
+    }
+
+    /**
+     * es ist eine referenz
+     */
+    public void reference() {
+        this.ref = true;
+    }
+
+    /**
+     * Ist es eine Referenz?
+     */
+    public boolean isReference() {
+        return ref;
+    }
+
+    /**
+     * bekomme die optional Expression
+     */
+    public Expression getOptional() {
+        return optional;
+    }
+
+    /**
+     * Setzt die Expression
+     */
+    public void setOptional(Expression expr) {
+        optional = expr;
+    }
+
+    /**
+     * Setzt es statisch
+     */
+    public void setStatic(boolean st) {
+        this.isStatic = st;
+    }
+
+    /**
+     * Ist es statisch?
+     */
+    public boolean isStatic() {
+        return isStatic;
+    }
+
+    /**
+     * Die ID
+     */
+    public int getID() {
+        return id;
+    }
+
+
+    /**
+     * Doch nicht benutzt
+     */
+    public void notUsed() {
+        this.used = false;
     }
 }

@@ -128,7 +128,7 @@ class<datatype> list
 	end
 end
 
-var liste = new list //<int> optional, da durch .set der datentyp bestimmt wird
+var liste = new list<int>
 
 liste.set(100)
 
@@ -198,6 +198,7 @@ klasse.test123()
 function<Datentyp> duckTyping(var:datentyp)
 	var.test123()
 end
+
 
 duckTyping klasse //geht, da klasse test123 implementiert
 duckTyping<int> klasse //geht nicht, da klasse kein int ist, das <int> ist optional

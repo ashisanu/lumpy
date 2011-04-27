@@ -15,7 +15,7 @@ public abstract class ExpressionVariable extends ExpressionIdentifier {
         super(p, null);
 
         this.var = var;
-
+        
         var.use();
     }
 
@@ -27,7 +27,7 @@ public abstract class ExpressionVariable extends ExpressionIdentifier {
     @Override
     public Datatype getDatatype() throws SyntaxException {
         if (var.getDatatype() == null) {
-            getParser().error("Datatype of variable: "+var.getName()+" is unknown.");
+            getParser().error("Datatype of variable: "+var.getName()+" is unknown.",true);
         }
         return var.getDatatype();
     }

@@ -11,7 +11,7 @@ public class Lexer {
     private static final String[] split = {
         "<<",">>","<=","=>","=<","!=","==","++",
         " ","\t","\n",":","--","+=","-=",
-        "+", "-", "*", "/",
+        "+", "-", "*", "/","..",
         ",","(",")",".",
         "=","[","]","{",
         "}","\"","'","<",
@@ -111,9 +111,20 @@ public class Lexer {
                     long a = new Long(t.getText());
                     t = it.next();
                     if (t.getText().equals(".")) {
+                        Token dot = t;
                         t = it.next();
-                        long b = new Long(t.getText());
-
+                        long b = 0;
+                        try {
+                            b = new Long(t.getText());
+                        } catch(NumberFormatException ex) {
+                            tmp.lower();
+                            dot.lower();
+                            t.lower();
+                            newList.add(tmp);
+                            newList.add(dot);
+                            newList.add(t);
+                            continue;
+                        }
                         newList.add(new Token(a+"."+b,tmp.getWholeLine(),tmp.getLine(),tmp.getPos()));
                         continue;
                     } else {
@@ -125,8 +136,8 @@ public class Lexer {
             }
         }
         tokens = newList;
-        tokens.addFirst(new Token("do","do",0,0));
-        tokens.addLast(new Token("end","end",0,0));
+        //tokens.addFirst(new Token("do","do",0,0));
+        //tokens.addLast(new Token("end","end",0,0));
         
         //aufräumen
         it = tokens.listIterator();
@@ -136,7 +147,6 @@ public class Lexer {
                 it.remove();
         }
         tokens.addLast(new Token("","",0,0));
-        
     }
     
     /**

@@ -99,7 +99,7 @@ public abstract class ExpressionManager {
     /**
      * new
      */
-    public abstract ExpressionNew getNewExpression(Datatype data);
+    public abstract ExpressionNew getNewExpression(Datatype data) throws SyntaxException;
     /**
      * new
      */
@@ -222,6 +222,23 @@ public abstract class ExpressionManager {
      * @return
      */
     public abstract ExpressionThrow getThrowExpression(Expression expr);
+
+    /**
+     * Ein automatisch erzeugtes Array
+     */
+    public abstract ExpressionAutoArray getAutoArrayExpression(LinkedList<Expression> exprs) throws SyntaxException;
+
+    /**
+     * Statischer Zugriff
+     */
+    public abstract ExpressionStaticAccess getStaticAccessExpression(Class c);
+
+    /**
+     * Slice
+     */
+
+    public abstract ExpressionSlice getSliceExpression(ExpressionIdentifier self, Expression start, Expression end) throws SyntaxException;
+
     /**
      * Liefert den Parser zurück
      * @return

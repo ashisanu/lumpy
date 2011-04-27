@@ -25,15 +25,25 @@ public class CExpressionAssignment extends ExpressionAssignment {
         return str;
     }
 
-    public static String getAccess(Variable var) {
-        return "_"+var.getSynonym()+"_";
+    public static String getDatatype(Variable var) {
+        String str = getDatatype(var.getDatatype());
+        if (var.isReference()) str = str + "*";
+        return str;
     }
+
+    public static String getAccess(Variable var) {
+         String str =  "_"+var.getSynonym()+"_";
+         if (var.isReference()) str = "(*" + str + ")";
+         return str;
+    }
+
     public static String getDatatype(Datatype typ) {
         String name = typ.toString();
         if (typ.isGC()) name = "GCNode*";
 
         return name;
     }
+
     public static String getRealDatatype(Datatype typ) {
         String str = typ.toString().replace("[]","*");
         if (str.length() >6 && str.substring(0, 6).equals("string")) {
@@ -41,9 +51,10 @@ public class CExpressionAssignment extends ExpressionAssignment {
         }
         return str;
     }
+
     public static String getArrayDatatype(Datatype typ) {
         String name = typ.toString().replace("[]","");
-        if (typ.isGC()) name = "GCNode*";
+        if (typ.isClass() || typ.getUnsafeID() == Datatype.STRING_DATATYPE) name = "GCNode*";
         for (int i = 1;i<typ.getDimensions();i++) {
             name += "*";
         }

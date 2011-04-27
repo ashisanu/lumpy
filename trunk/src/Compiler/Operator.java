@@ -5,6 +5,8 @@
 
 package Compiler;
 
+import java.util.LinkedList;
+
 /**
  *
  * @author Coolo
@@ -14,20 +16,23 @@ public class Operator {
     private int prio;
     private int ret = -1;
     private int[] datatypes;
+    private String realName;
+    private LinkedList<CodeFunction> overloads = new LinkedList<CodeFunction>();
     /**
      * Erstellt einen neuen Operator
      * @param op Wie der Operator im source steht
      * @param prio Die Priorität
      * @param datatypes Die Datentypen, den dieser Operator verarbeiten kann
      */
-    public Operator(String op, int prio, int[] datatypes) {
+    public Operator(String op,String realName, int prio, int[] datatypes) {
         this.op = op;
         this.prio = prio;
         this.datatypes = datatypes;
+        this.realName = realName;
     }
 
-    public Operator(String op,int prio,int[] datatypes,int ret) {
-        this(op,prio,datatypes);
+    public Operator(String op, String realName, int prio,int[] datatypes,int ret) {
+        this(op,realName, prio,datatypes);
         this.ret = ret;
     }
     /**
@@ -56,5 +61,39 @@ public class Operator {
      */
      public int getReturn() {
          return ret;
+     }
+
+     /**
+      * Overload
+      */
+     public void addOverload(CodeFunction func) {
+         overloads.add(func);
+     }
+
+     /**
+      * Liefert den Overload
+      *
+      */
+     public LinkedList<CodeFunction> getOverloads() {
+         return overloads;
+     }
+
+     /**
+      * Liefert die overloads, als Function Datentyp
+      */
+     public LinkedList<Function> getFunctions() {
+         LinkedList<Function> funcs = new LinkedList<Function>();
+         for (CodeFunction f: overloads) {
+             funcs.add(f);
+         }
+
+         return funcs;
+     }
+
+     /**
+      * Der wahre Name
+      */
+     public String getRealName() {
+         return realName;
      }
 }

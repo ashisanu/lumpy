@@ -2,10 +2,13 @@ $IMPORT_CODE
 
 
 $MAIN_CODE
-
+#ifndef boolean
+#define boolean char
+#endif
 
 int main(int argc, char *argv[]) {
 	GCInit();
+	initStatic();
 	
 	function_program();
 	

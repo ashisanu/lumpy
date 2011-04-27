@@ -7,7 +7,7 @@ import Compiler.Parser.Parser;
  * Eine 4 Byte Ganzzahl
  * @author Coolo
  */
-public abstract class ExpressionInteger extends Expression {
+public abstract class ExpressionInteger extends ExpressionIdentifier {
     private int number;
     
     

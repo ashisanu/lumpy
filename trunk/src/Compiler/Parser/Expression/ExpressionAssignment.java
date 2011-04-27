@@ -16,7 +16,9 @@ public abstract class ExpressionAssignment extends ExpressionIdentifier {
         this.var = var;
         this.expr = expr;
         this.get = get;
-
+        if (var.isConstant()) {
+            getParser().error("Cannot assign a constant '"+var.getName()+"'.");
+        }
         this.var.use();
     }
 

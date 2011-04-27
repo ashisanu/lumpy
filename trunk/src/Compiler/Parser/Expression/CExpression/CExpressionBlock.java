@@ -45,7 +45,13 @@ public class CExpressionBlock extends ExpressionBlock {
         if (inGenerator) {
             yieldRetCounter = 0;
             getParser().identUp();
-            String v = "(("+c.toString()+"*)_this_ -> data) -> _status_";
+            String v = "";
+            if (CExpressionFunctionDeclaration.currentFunction != null && CExpressionFunctionDeclaration.currentFunction.isStatic()) {
+                v = "__static__"+c.getName()+"__status_";
+            } else {
+                v = "(("+c.toString()+"*)_this_ -> data) -> _status_";
+            }
+            
             str += "switch ("+v+") {"+getParser().newLine();
             str += "case 0:"+getParser().newLine();
             varAcc = v;

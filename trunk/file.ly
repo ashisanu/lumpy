@@ -1,37 +1,58 @@
 import lumpy
 
-class test
-	public function toString:string()
-		return "exception"
+function program()
+	print "lol: "+string(ducktyping(10,20))
+	print "rofl: "+string(ducktyping(209.0,30.5))
+	print "geht nicht: "+string(ducktyping("Blau","Gelbe scheisse"))
+	var t = new test(100)
+	t.lol 50.9
+	
+	schnatter new duck
+	schnatter new dog
+end
+
+function schnatter(obj)
+	obj.laut
+end
+
+function ducktyping(test1, test2)
+	static try
+		return test1 < test2
 	end
+	catch
+		try test1.length() < test2.length()
+			return test1.length < test2.length
+		end
+		catch //ansonsten
+			syntaxerror "test1 and test2 must implement '<' operator"
+		end
+	end
+end
+
+class test
+	public function new(vari:int)
+		print string(vari)
+	end
+	
+	public function lol(v)
+		print "lol in Methode: "+string(v)
+	end
+end
+
+class duck
+	public function laut()
+		print "schnatter"
+	end
+	
 	public function new()
 	end
 end
 
-function program()
-	try ex
-		throwFunc
-		return
+class dog
+	public function laut()
+		print "wuff"
 	end
-	catch string
-		print "exception: " + ex
+	
+	public function new()
 	end
-	catch int
-		print "eine int exceptioN" + string(ex)
-	end
-	catch test
-		print ex.toString()
-	end
-	catch
-		print "wtf"
-	end
-	finally
-		print "ich werde immer ausgeführt"
-	end
-end
-
-function throwFunc()
-	throw new test
-	//throw "lol"
-	//throw 42
 end

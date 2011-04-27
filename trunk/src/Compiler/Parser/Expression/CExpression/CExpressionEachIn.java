@@ -39,7 +39,9 @@ public class CExpressionEachIn extends ExpressionEachIn {
                 startFunc = func;
             }
         }
-        String str = "";
+        String str = "{";
+        getParser().identUp();
+        str += getParser().newLine();
         str += init.generate()+";"+getParser().newLine();
         str += startFunc.generateFuncName()+"("+in.generate()+");"+getParser().newLine();
         String inv = var.generate()+" = "+invokeFunc.generateFuncName()+"("+in.generate()+");"+getParser().newLine();
@@ -51,6 +53,8 @@ public class CExpressionEachIn extends ExpressionEachIn {
         getParser().identDown();
         str += getParser().newLine();
         str += inv;
+        getParser().identDown();
+        str += "}"+getParser().newLine();
         str += "}"+getParser().newLine();
 
         return str;

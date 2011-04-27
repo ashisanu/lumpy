@@ -6,10 +6,6 @@ namespace std
 end
 
 
-interface comperator
-	public function compareto(other:object)
-	public function hashcode()
-end
 
 class object
 	public function toString()
@@ -21,7 +17,7 @@ class object
 	end
 end
 
-class player <object, comperator //maximal eine class beliebig viele interfaces
+class player <object
 	public static var test = 200
 	public static funktion:void()
 		//statisch

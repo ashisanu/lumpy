@@ -7,7 +7,7 @@ import Compiler.Parser.Parser;
  * Eine 4 Byte  Kommazahl
  * @author Coolo
  */
-public abstract class ExpressionFloat extends Expression {
+public abstract class ExpressionFloat extends ExpressionIdentifier {
     private float number;
 
     /**

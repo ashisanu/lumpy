@@ -1,6 +1,7 @@
 package Compiler;
 
 import Compiler.Parser.Expression.ExpressionBlock;
+import Compiler.Parser.Parser;
 
 /**
  * Eine Funktion, die im Code steht. Also mit function() ... end definiert wurde
@@ -19,6 +20,8 @@ public class CodeFunction extends Function {
     private Scope scope;
     private ExpressionBlock block;
     private int typ = IS_NORMAL;
+    private int mode = Class.IS_NORMAL; //abstract, final oder normal?
+    private boolean duckType = false; //Ist es eine ducktype funktion?
     /**
      * Konstruktor
      * @param name
@@ -88,5 +91,33 @@ public class CodeFunction extends Function {
      */
     public boolean isGenerator() {
         return isGen;
+    }
+
+    /**
+     * der modus
+     */
+    public void setMode(int m) {
+        this.mode = m;
+    }
+
+    /**
+     * gibt den modus zurück
+     */
+    public int getMode() {
+        return mode;
+    }
+
+    /**
+     * Ducktyping
+     */
+    public void setDuckType() {
+        duckType = true;
+    }
+
+    /**
+     * Ist es ducktype?
+     */
+    public boolean isDuckType() {
+        return duckType;
     }
 }
