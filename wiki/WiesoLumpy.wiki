@@ -6,13 +6,13 @@ Sorry for all the english people, my english isn't good enough to write this art
 Als ich mich vor einiger Zeit nach einer für mich "perfekten" Programmiersprache umgesehen habe, musste ich ernüchternd feststellen, dass es kaum welche gibt, die meinen Ansprüchen recht werden.
 
 Doch was erwarte ich von einer Sprache?
- * Objektorientierte Programmierung
- * Schnelle Ausführung
- * Leistungsstarke Sprachelemente (Generatoren, Templates/Generics, Properties,...)
- * Keine C Syntax
- * Statische Typisierung
- * Platformunabhängig
- * Stabilität
+ * Objektorientierte Programmierung: Große Projekte mit möglichst wenig Overhead koordinieren
+ * Schnelle Ausführung: Echtzeitanwendungen einfach erstellen
+ * Leistungsstarke Sprachelemente (Generatoren, Templates/Generics, Properties,...): Ohne viel drum herum programmieren zu müssen.
+ * Keine C Syntax: Für Menschen einfacher zu lesen
+ * Statische Typisierung: Fehler bereits zur Kompilierzeit feststellen
+ * Platformunabhängig: Keine Einschränkungen was die Platform anbelangt
+ * Stabilität: Zuverlässiges Exceptionsystem.
 
 So. Welche Sprachen bleiben nun übrig? Mir fällt nun eigentlich keine Sprache ein, die wirklich all diese Elemente implementiert. Die Idee für eine für mich "perfekte" Programmiersprache war geboren.
 
