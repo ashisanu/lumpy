@@ -22,6 +22,7 @@ public class CodeFunction extends Function {
     private int typ = IS_NORMAL;
     private int mode = Class.IS_NORMAL; //abstract, final oder normal?
     private boolean duckType = false; //Ist es eine ducktype funktion?
+    private boolean triedToDuck = false; //bereits ducktyping probiert?
     /**
      * Konstruktor
      * @param name
@@ -119,5 +120,19 @@ public class CodeFunction extends Function {
      */
     public boolean isDuckType() {
         return duckType;
+    }
+
+    /**
+     * ducktyping probiert
+     */
+    public void tryDuck(boolean t) {
+        this.triedToDuck = t;
+    }
+
+    /**
+     * hats schon probiert?
+     */
+    public boolean duckTry() {
+        return triedToDuck;
     }
 }

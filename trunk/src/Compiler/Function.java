@@ -38,10 +38,14 @@ public class Function extends Variable {
         parameters.add(var);
 
         if (expr != null) {
-            if (var.getDatatype().match(expr.getDatatype())) {
-                var.setDatatype(expr.getDatatype());
+            if (var.getDatatype() != null) {
+                if (var.getDatatype().match(expr.getDatatype())) {
+                    var.setDatatype(expr.getDatatype());
+                } else {
+                   p.error(var.getDatatype().generateErrorMsg(expr.getDatatype()));
+                }
             } else {
-               p.error(var.getDatatype().generateErrorMsg(expr.getDatatype()));
+                var.setDatatype(expr.getDatatype());
             }
         }
 

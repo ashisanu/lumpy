@@ -1,0 +1,48 @@
+Class<Type> FlowVar
+	private var adress
+	private var value: Type
+	
+	public property Data
+		get
+			return this.value
+		end
+	end
+	
+	
+	public function hasChanged(ref var:Type)
+		if this.value <> var
+			return true
+		end
+		else
+			return false
+		end
+	end
+	
+	public function new(ref Var: Type)
+		this.adress = adressOf Var
+		this.value = var
+	end
+end
+
+class<DataLeft, DataRight> Flow
+	private var left = 0, right = 0
+	private var leftVar, RightVar
+	private var flowing = true
+	
+	public function update(ref i:DataLeft)
+		
+	end
+	
+	public function new(ref left:int, ref right:int)
+		leftVar = new FlowVar<DataLeft>(left)
+		rightVar = new FlowVar<DataRight>(right)
+	end 
+	
+	public function start()
+		
+	end
+	
+	public function stop()
+		
+	end
+end

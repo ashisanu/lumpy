@@ -38,6 +38,20 @@ GCNode* new_exception() {
 	return obj;
 	
 }
+GCNode* cast2assertexception(GCNode* node) {
+	node -> typid = TYP_ASSERTEXCEPTION;
+	return node;
+	
+}
+GCNode* new_assertexception() {
+	GCNode* obj = gc_malloc(sizeof(assertexception), &standardTrace);
+	((assertexception*)obj -> data) -> typid = TYP_ASSERTEXCEPTION;
+	((assertexception*)obj -> data) -> superclass = TYP_EXCEPTION;
+	obj -> typid = TYP_ASSERTEXCEPTION;
+	((assertexception*)obj -> data) -> __name_ = newString("");
+	return obj;
+	
+}
 GCNode* cast2nullpointerexception(GCNode* node) {
 	node -> typid = TYP_NULLPOINTEREXCEPTION;
 	return node;
@@ -144,7 +158,7 @@ GCNode* exception_get_name(GCNode* _this_) {
 	switch (tmpid) {
 		case TYP_EXCEPTION: 
 			{
-				//Line: 76
+				//Line: 77
 				return (((exception*)_this_ -> data) -> __name_);
 				return newString("");
 				
@@ -153,7 +167,7 @@ GCNode* exception_get_name(GCNode* _this_) {
 			break;
 		default:
 			{
-				//Line: 76
+				//Line: 77
 				return (((exception*)_this_ -> data) -> __name_);
 				return newString("");
 				
@@ -179,7 +193,7 @@ GCNode* exception_new(GCNode* _this_, GCNode* _param_0_) {
 				stack_enter(1, NULL);
 				
 				stack_create(&_param_0_, 0);
-				//Line: 85
+				//Line: 86
 				(((exception*)_this_ -> data) -> __name_) = _param_0_;
 				stack_leave();
 				return _this_;
@@ -193,7 +207,7 @@ GCNode* exception_new(GCNode* _this_, GCNode* _param_0_) {
 				stack_enter(1, NULL);
 				
 				stack_create(&_param_0_, 0);
-				//Line: 85
+				//Line: 86
 				(((exception*)_this_ -> data) -> __name_) = _param_0_;
 				stack_leave();
 				return _this_;
@@ -218,7 +232,7 @@ GCNode* nullpointerexception_new(GCNode* _this_) {
 	switch (tmpid) {
 		case TYP_NULLPOINTEREXCEPTION: 
 			{
-				//Line: 91
+				//Line: 109
 				(((nullpointerexception*)_this_ -> data) -> __name_) = newString("Null Pointer");
 				return _this_;
 				
@@ -227,7 +241,7 @@ GCNode* nullpointerexception_new(GCNode* _this_) {
 			break;
 		default:
 			{
-				//Line: 91
+				//Line: 109
 				(((nullpointerexception*)_this_ -> data) -> __name_) = newString("Null Pointer");
 				return _this_;
 				
@@ -239,7 +253,7 @@ GCNode* nullpointerexception_new(GCNode* _this_) {
 	
 }
 void throwNullPointer() {
-	//Line: 99
+	//Line: 117
 	//throw: nullpointerexception_new (new_nullpointerexception() )
 	exc_holder_obj = nullpointerexception_new (new_nullpointerexception() );
 	throwException(TYP_NULLPOINTEREXCEPTION);
@@ -260,7 +274,7 @@ GCNode* invalidsliceoperationexception_new(GCNode* _this_) {
 	switch (tmpid) {
 		case TYP_INVALIDSLICEOPERATIONEXCEPTION: 
 			{
-				//Line: 104
+				//Line: 122
 				(((invalidsliceoperationexception*)_this_ -> data) -> __name_) = newString("Invalid Slice Operation");
 				return _this_;
 				
@@ -269,7 +283,7 @@ GCNode* invalidsliceoperationexception_new(GCNode* _this_) {
 			break;
 		default:
 			{
-				//Line: 104
+				//Line: 122
 				(((invalidsliceoperationexception*)_this_ -> data) -> __name_) = newString("Invalid Slice Operation");
 				return _this_;
 				
@@ -281,7 +295,7 @@ GCNode* invalidsliceoperationexception_new(GCNode* _this_) {
 	
 }
 void throwSliceException() {
-	//Line: 113
+	//Line: 131
 	//throw: invalidsliceoperationexception_new (new_invalidsliceoperationexception() )
 	exc_holder_obj = invalidsliceoperationexception_new (new_invalidsliceoperationexception() );
 	throwException(TYP_INVALIDSLICEOPERATIONEXCEPTION);
@@ -302,7 +316,7 @@ GCNode* outofmemoryexception_new(GCNode* _this_) {
 	switch (tmpid) {
 		case TYP_OUTOFMEMORYEXCEPTION: 
 			{
-				//Line: 119
+				//Line: 137
 				(((outofmemoryexception*)_this_ -> data) -> __name_) = newString("Out Of Memory");
 				return _this_;
 				
@@ -311,7 +325,7 @@ GCNode* outofmemoryexception_new(GCNode* _this_) {
 			break;
 		default:
 			{
-				//Line: 119
+				//Line: 137
 				(((outofmemoryexception*)_this_ -> data) -> __name_) = newString("Out Of Memory");
 				return _this_;
 				
@@ -323,7 +337,7 @@ GCNode* outofmemoryexception_new(GCNode* _this_) {
 	
 }
 void throwOutOfMemory() {
-	//Line: 127
+	//Line: 145
 	//throw: outofmemoryexception_new (new_outofmemoryexception() )
 	exc_holder_obj = outofmemoryexception_new (new_outofmemoryexception() );
 	throwException(TYP_OUTOFMEMORYEXCEPTION);
