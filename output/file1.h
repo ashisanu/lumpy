@@ -1,7 +1,7 @@
 #ifndef boolean
 #define boolean char
 #endif
-#define TYP_OBJECT 1003
+#define TYP_OBJECT 1000
 typedef struct __object__ {
 	int typid;
 	int superclass;
@@ -9,7 +9,7 @@ typedef struct __object__ {
 } object;
 GCNode* cast2object(GCNode* node);
 GCNode* new_object();
-#define TYP_EXCEPTION 1004
+#define TYP_EXCEPTION 1001
 typedef struct __exception__ {
 	//Inherit from: object
 	int typid;
@@ -19,7 +19,17 @@ typedef struct __exception__ {
 } exception;
 GCNode* cast2exception(GCNode* node);
 GCNode* new_exception();
-#define TYP_NULLPOINTEREXCEPTION 1005
+#define TYP_ASSERTEXCEPTION 1002
+typedef struct __assertexception__ {
+	//Inherit from: exception
+	int typid;
+	int superclass;
+	GCNode* __name_;
+	
+} assertexception;
+GCNode* cast2assertexception(GCNode* node);
+GCNode* new_assertexception();
+#define TYP_NULLPOINTEREXCEPTION 1003
 typedef struct __nullpointerexception__ {
 	//Inherit from: exception
 	int typid;
@@ -30,7 +40,7 @@ typedef struct __nullpointerexception__ {
 GCNode* __static__nullpointerexception__forcecreate_;
 GCNode* cast2nullpointerexception(GCNode* node);
 GCNode* new_nullpointerexception();
-#define TYP_INVALIDSLICEOPERATIONEXCEPTION 1006
+#define TYP_INVALIDSLICEOPERATIONEXCEPTION 1004
 typedef struct __invalidsliceoperationexception__ {
 	//Inherit from: exception
 	int typid;
@@ -41,7 +51,7 @@ typedef struct __invalidsliceoperationexception__ {
 GCNode* __static__invalidsliceoperationexception__forcecreate_;
 GCNode* cast2invalidsliceoperationexception(GCNode* node);
 GCNode* new_invalidsliceoperationexception();
-#define TYP_OUTOFMEMORYEXCEPTION 1007
+#define TYP_OUTOFMEMORYEXCEPTION 1005
 typedef struct __outofmemoryexception__ {
 	//Inherit from: exception
 	int typid;
@@ -52,7 +62,7 @@ typedef struct __outofmemoryexception__ {
 GCNode* __static__outofmemoryexception__forcecreate_;
 GCNode* cast2outofmemoryexception(GCNode* node);
 GCNode* new_outofmemoryexception();
-#define TYP_LISTVALUEITERATOR 1008
+#define TYP_LISTVALUEITERATOR 1006
 typedef struct __listvalueiterator__ {
 	//Inherit from: object
 	int typid;
@@ -61,7 +71,7 @@ typedef struct __listvalueiterator__ {
 } listvalueiterator;
 GCNode* cast2listvalueiterator(GCNode* node);
 GCNode* new_listvalueiterator();
-#define TYP_LISTNODEITERATOR 1009
+#define TYP_LISTNODEITERATOR 1007
 typedef struct __listnodeiterator__ {
 	//Inherit from: object
 	int typid;
@@ -70,7 +80,7 @@ typedef struct __listnodeiterator__ {
 } listnodeiterator;
 GCNode* cast2listnodeiterator(GCNode* node);
 GCNode* new_listnodeiterator();
-#define TYP_LIST 1010
+#define TYP_LIST 1008
 typedef struct __list__ {
 	//Inherit from: object
 	int typid;
@@ -79,7 +89,7 @@ typedef struct __list__ {
 } list;
 GCNode* cast2list(GCNode* node);
 GCNode* new_list();
-#define TYP_NODE 1011
+#define TYP_NODE 1009
 typedef struct __node__ {
 	//Inherit from: object
 	int typid;

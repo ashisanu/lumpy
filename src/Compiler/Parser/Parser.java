@@ -30,10 +30,11 @@ public abstract class Parser {
         "try",
         "catch",
         "finally",
-        "namespace",
         "struct",
         "operator",
         "rem",
+        "ensure",
+        "require",
     };
     private static Operator[] operators;
     private int maxPrio;
@@ -256,23 +257,26 @@ public abstract class Parser {
         }
         while (!getCurrent().getText().equals("end")) {
             while (isToken("\n")) match("\n");
+            Expression ex = null;
             try {
                 int line = getCurrent().getLine();
-                Expression ex = line(isMain);
+                ex = line(isMain);
                 ex.setLine(line);
                 block.addLine(ex);
-            } catch (SyntaxException ex) {
-                if (ex.isDuck()) {
-                    throw ex;
+            } catch (SyntaxException exc) {
+                if (exc.isDuck()) {
+                    throw exc;
                 } else {
-                    System.out.println(ex.genError());
+                    System.out.println(exc.genError());
                     fixError();
                 }
-            } catch (Exception ex) {
+            } catch (Exception exc) {
                 System.out.println(new SyntaxException("Unknown error",getCurrent(),false).genError());
-                ex.printStackTrace(System.out);
+                exc.printStackTrace(System.out);
             }
-            match("\n");
+            //if (ex != null && ex instanceof ExpressionIf);
+            //else
+                //match("\n");
             while (isToken("\n")) match("\n");
         }
         match("end");
@@ -332,6 +336,26 @@ public abstract class Parser {
                     
                     ExpressionBlock funcBlock =null;
                     try {
+                        if (isToken("require") || isToken("ensure")) {
+                            while (isToken("require") || isToken("ensure")) {
+                                boolean isRequire;
+                                if (isToken("require")) {
+                                    isRequire = true;
+                                } else {
+                                    isRequire = false;
+                                }
+                                getNext();
+                                
+                                while (!isToken("end")) {
+                                    Expression expr = operator(0);
+                                    if (!expr.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
+                                        error("Expression in ensure has to be boolean.");
+                                    }
+                                }
+
+
+                            }
+                        }
                         funcBlock = block(generator); //nun den block parsen
                     } catch(SyntaxException ex) {
                         duck = ex;
@@ -392,7 +416,13 @@ public abstract class Parser {
             }
             //templates automatich generieren lassen
             CodeFunction cfunc = (CodeFunction)func;
+            if (cfunc.duckTry()) {
+                throw duck;
+            } else {
+                cfunc.tryDuck(true);
+            }
             cfunc.notUsed();
+            if (cfunc.isDuckType()) error("Datatype of function parameter not resolvable.");
             cfunc.setDuckType();
             CodeFunction f = new CodeFunction(func.getName(),func.getDatatype(),new Scope("",this,null));
             
@@ -409,7 +439,7 @@ public abstract class Parser {
             f.setPublic(cfunc.isPublic());
             f.setStatic(f.isStatic());
             f.setDatatype(cfunc.getDatatype());
-
+            f.use();
             compileFunction(f,parameters);
             f.getScope().setClass(cfunc.getScope().getOwnerClass());
 
@@ -607,6 +637,11 @@ public abstract class Parser {
             match("null");
             return getManager().getNullExpression();
         }
+        if (isToken("adressof")) {
+            match("adressof");
+            ExpressionIdentifier ident = variableExpression();
+            return getManager().getAdressOfExpression(ident);
+        }
         if (isToken("-")) {
             match("-");
             expr = operator(0);
@@ -678,6 +713,7 @@ public abstract class Parser {
         for (Function func : functions) {
             newFuncs.add(func);
             if (func.getName().equals(funcName) && !func.isCompiled() && func instanceof CodeFunction) {
+                
                 Function tmp = compileFunction(func, parameters);
                 if (tmp != func) {
                     newFuncs.removeLast();
@@ -1484,7 +1520,11 @@ public abstract class Parser {
                 if (start) {
                     match(",");
                 }
-
+                boolean isRef = false;
+                if (isToken("ref")) {
+                    isRef = true;
+                    error("No reference in 'var'");
+                }
                 String name = getCurrent().getText();
                 Datatype datatype = standardDatatype;
                 getNext();
@@ -1494,6 +1534,8 @@ public abstract class Parser {
                 
                 
                 Variable vari = new Variable(name, datatype);
+                if (isRef) vari.reference();
+                
                 if (inGenerator) {
                     if (currentClass.getAttibutes() != null) {
                         for (Variable att: currentClass.getAttibutes()) {
@@ -1562,7 +1604,6 @@ public abstract class Parser {
             if (isToken("else")) {
                 match("else");
                 elseBlock = block(false);
-
             }
 
             return getManager().getIfExpression(expr, block, elseBlock, list);
@@ -1580,7 +1621,8 @@ public abstract class Parser {
                     overJumpBlock();
                 }
             } catch (SyntaxException ex) {
-                iterator = tokens.listIterator(iterator.nextIndex());
+                
+                iterator = tokens.listIterator(tmp.nextIndex());
                 getNext();
                 overJumpBlock();
                 if (isToken("\n")) match("\n");
@@ -1592,24 +1634,27 @@ public abstract class Parser {
                         tmpBlock = block(false);
                     } catch (SyntaxException ex2) {
                         iterator = tmp;
+                        getNext();
                         overJumpBlock();
+                        if (isToken("\n")) match("\n");
                         match("catch");
                         overJumpBlock();
                         throw ex;
                     }
                     execute = tmpBlock;
+
                 } else {
                     execute = block(false);
                 }
             }
             iterator = tmp;
-            overJumpBlock();
-            match("catch");
-            overJumpBlock();
+            
             return execute;
         } else if (isToken("try")) {
             match("try");
             String name = getCurrent().getText();
+            boolean noName = false;
+            if (name.equals("\n")) noName = true;
             LinkedList<ExpressionBlock> catches = new LinkedList<ExpressionBlock>();
             LinkedList<Datatype> datas = new LinkedList<Datatype>();
             ExpressionBlock finallyBlock = null;
@@ -1622,6 +1667,7 @@ public abstract class Parser {
                     datas.add(new Datatype(Datatype.VOID_DATATYPE,0,null));
                     catches.add(block(false));
                 } else {
+                    if (noName) error("No variable name specified.");
                     Datatype data = datatype(false,false);
                     datas.add(data);
                     Scope s = currentScope;
@@ -1744,6 +1790,8 @@ public abstract class Parser {
                     //getNext();
                     inLoop = bef;
                     currentScope = tmpScope;
+                    getPrevious();
+                    getPrevious();
                     //zusammensetzen
                     return getManager().getSimpleForExpression(var,start, to,step, block);
                 } else if (isToken("in")) {
@@ -2438,7 +2486,9 @@ public abstract class Parser {
             if (!inExtern) ((CodeFunction)func).setStartToken(getCurrent());
 
             match("\n");
+
             
+
             if (!inExtern && !isAbstract) {
 
                 overJumpBlock();

@@ -270,5 +270,14 @@ public class ExpressionManagerC extends ExpressionManager {
     public ExpressionSlice getSliceExpression(ExpressionIdentifier self, Expression start, Expression end) throws SyntaxException {
         return new CExpressionSlice(getParser(), self, start, end);
     }
+    /**
+     * Adress Of
+     * @param ident
+     * @return
+     * @throws SyntaxException
+     */
+    public ExpressionAdressOf getAdressOfExpression(ExpressionIdentifier ident) throws SyntaxException {
+        return new CExpressionAdressOf(getParser(), ident);
+    }
 
  }

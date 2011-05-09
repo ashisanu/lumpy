@@ -96,6 +96,14 @@ public class Datatype {
     public Datatype(Datatype data,int dimensions,LinkedList<Datatype> parameters) {
         this(data.getID(),dimensions,parameters);
     }
+
+    /**
+     * Void Konstruktor
+     */
+    public Datatype() {
+        this(Datatype.VOID_DATATYPE, 0, null);
+    }
+
     /**
      * Konsturktor
      * @param id die ID

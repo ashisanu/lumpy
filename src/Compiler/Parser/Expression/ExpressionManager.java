@@ -238,7 +238,13 @@ public abstract class ExpressionManager {
      */
 
     public abstract ExpressionSlice getSliceExpression(ExpressionIdentifier self, Expression start, Expression end) throws SyntaxException;
-
+    /**
+     * AdressOf
+     * @param ident
+     * @return
+     * @throws SyntaxException
+     */
+    public abstract ExpressionAdressOf getAdressOfExpression(ExpressionIdentifier ident) throws SyntaxException;
     /**
      * Liefert den Parser zurück
      * @return

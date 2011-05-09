@@ -22,6 +22,7 @@ extern
 	function intern_stringasc:int(str:string) = "str_asc"
 	function intern_stringhash:int(str:string) = "str_hash"
 	
+	
 	function print:void(text:String) = "print_string"
 	function print:void(text:int) = "print_int"
 end
@@ -85,12 +86,29 @@ class abstract exception
 	end
 end
 
+class final AssertException < exception
+	public function new()
+		this._name = "Assert Error"
+	end
+end
+
+function assert(expr)
+	if expr
+		return true
+	end
+	else
+		throw new AssertException
+	end
+	
+end
+
+
 class final NullPointerException < exception
 	public function new()
 		this._name = "Null Pointer"
 	end
 	
-	private static var forceCreate = new NullPointerException //den "compile on demand" parser austricken :>, da dieser sonst keine instanz von NullPointerException kompilieren würde.
+	private static var forceCreate = new NullPointerException //den "compile on demand" parser austricken :>, da dieser sonst keine Klasse von NullPointerException kompilieren würde.
 
 end
 
