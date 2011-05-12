@@ -326,6 +326,12 @@ print array[..] //creates a new copy
 == automatic array generation ==
 {{{
 var arr = [10,20,30,40,50]
+var multiarr = [
+   [10,20,30],
+   [10,20,30],
+   [10,20,30],
+   [10,20,30]
+]
 }}}
 
 
