@@ -19,7 +19,7 @@ public class CExpressionFunctionCall extends ExpressionFunctionCall {
     @Override
     public String generate() {
         String str = getFunction().generateFuncName();
-        str += " (";
+        str += "( ";
         boolean start = false;
         int i = 0;
         if (getFunction() instanceof CodeFunction && ((CodeFunction)getFunction()).getScope().getOwnerClass() != null && !getFunction().isStatic()) {

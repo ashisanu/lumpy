@@ -63,13 +63,18 @@ public class Lexer {
                 t = new Token(str,t.getWholeLine(),t.getLine(),t.getPos());
                 newList.add(t);
             } else if (t.getText().equals("/")) {
+                Token tmp = t;
                 if (it.hasNext()) {
                     t = it.next();
-                    t = it.next();
+                    if (t.getText().equals("")) t = it.next();
+
                     if (t.getText().equals("/")) {
                         while (!t.getText().equals("\n") && it.hasNext()) {
                             t = it.next();
                         }
+                    } else {
+                        newList.add(tmp);
+                        newList.add(t);
                     }
                 }
             } else if (t.getText().equals(">>")) {
@@ -147,6 +152,10 @@ public class Lexer {
                 it.remove();
         }
         tokens.addLast(new Token("","",0,0));
+
+        for (Token tok: tokens) {
+        //    System.out.println(tok.getText());
+        }
     }
     
     /**

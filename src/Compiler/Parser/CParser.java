@@ -89,7 +89,6 @@ public class CParser extends Parser {
                 identUp();
                 functionCode += "GCNode* cast2"+c.getName()+"(GCNode* node) {"+newLine();
                 functionCode += "";
-                //functionCode += "(("+c.getName()+"*)node) -> vtable = vtable_"+c.getName()+";"+newLine();
                 functionCode +=  "node -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
                 functionCode += "return node;"+newLine();
                 identDown();
@@ -102,8 +101,8 @@ public class CParser extends Parser {
                 functionCode +="GCNode* new_"+c.getName()+"() {"+newLine();
 
                 functionCode += "GCNode* obj = gc_malloc(sizeof("+c.getName()+"), &standardTrace);"+newLine();
-                functionCode += "(("+c.toString()+"*)obj -> data) -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
-                if (c.getInherit() != null) functionCode += "(("+c.toString()+"*)obj -> data) -> superclass = TYP_"+c.getInherit().getName().toUpperCase()+";"+newLine();
+                functionCode += "(("+c.getName()+"*)obj -> data) -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
+                if (c.getInherit() != null) functionCode += "(("+c.getName()+"*)obj -> data) -> superclass = TYP_"+c.getInherit().getName().toUpperCase()+";"+newLine();
                 functionCode += "obj -> typid = TYP_"+c.getName().toUpperCase()+";"+newLine();
 
                 Class tmpC = c;
@@ -121,7 +120,7 @@ public class CParser extends Parser {
                             if (att.isStatic()) {
                                 initStatics += "__static__"+c.getName()+"__"+att.getName()+"_ = "+init+";"+newLine();
                             } else {
-                                if (att.isUsed()) functionCode += "(("+c.toString()+"*)obj -> data) -> "+CExpressionAssignment.getAccess(att)+" = " + init+ ";"+newLine();
+                                if (att.isUsed()) functionCode += "(("+c.getName()+"*)obj -> data) -> "+CExpressionAssignment.getAccess(att)+" = " + init+ ";"+newLine();
                             }
                             i++;
                         }
@@ -147,7 +146,7 @@ public class CParser extends Parser {
             }
         }
 
-        Scope scope = getMainScope();
+        Scope scope = getHyperScope();
          //funktionheaders machen
         for (Function func:scope.getFunctions()) {
             if (func.isUsed() && (!func.isDefined() || !isMain)) { // && ((func instanceof CodeFunction && ((CodeFunction)func).getScope().getParser() != this) || !(func instanceof CodeFunction))) {
@@ -189,7 +188,7 @@ public class CParser extends Parser {
                     boolean start = false;
                     if (func instanceof CodeFunction) {
                         CodeFunction cfunc = (CodeFunction)func;
-
+                        
                         if (cfunc.getScope().getOwnerClass() != null && !cfunc.isStatic()) {
                             headerCode += CExpressionAssignment.getDatatype(new Datatype(Datatype.Name2Int(cfunc.getScope().getOwnerClass().getName()),0,null))+" _this_";
                             start = true;
@@ -216,7 +215,7 @@ public class CParser extends Parser {
                 functionCode += "va_list args;"+newLine();
                 functionCode += "va_start(args, size);"+newLine();
                 String typ = CExpressionAssignment.getDatatype(new Datatype(arr.getDatatype().getUnsafeID(),arr.getDatatype().getDimensions() -1 ,null));
-                functionCode += "GCNode* tmp = gc_malloc(sizeof(" + typ + ") * size, &standardTrace);"+newLine();
+                functionCode += "GCNode* tmp = allocarray_1_(sizeof(" + typ + "), size);"+newLine();
                 functionCode += "int i;"+newLine();
                 identUp();
                 functionCode += "for (i = 0; i < size; i++) {"+newLine();
@@ -258,6 +257,49 @@ public class CParser extends Parser {
 
                 identUp();
                 functionCode += head+" {"+newLine();
+                if ((i-1)>0) {
+                    functionCode += "GCNode** arr = malloc(sizeof(GCNode)*param0);"+newLine();
+                } else {
+                    functionCode += "void** arr = malloc(size*param0);"+newLine();
+                }
+                
+                functionCode += "int i;"+newLine();
+                functionCode += "for (i = 0;i < param0; i++) ";
+                if ((i-1)>0) {
+                    functionCode += "arr[i] = allocarray_"+(i-1)+"_(size";
+                    for (int j = 1; j < i; j++) {
+                        functionCode+= ", param"+j;
+                    }
+                    functionCode += ");"+newLine();
+                } else {
+                    functionCode += "arr[i] = NULL;"+newLine();
+                }
+                //functionCode +=" = malloc(size*param"+j+");"+newLine();
+               
+                functionCode += "GCNode* node = gc_malloc(0,&standardTrace);"+newLine();
+                functionCode += "node -> data = arr;"+newLine();
+                functionCode += "node -> size = size*"+all+";"+newLine();;
+                functionCode += "return node;"+newLine();
+                identDown();
+                functionCode += newLine();
+                functionCode += "}";
+                functionCode += newLine();
+
+                /* old alloc
+                 *  String head = "";
+                head += "GCNode* allocarray_"+i+"_(int size";
+                String all = "";
+                for (int j = 0; j<i;j++) {
+                    head += ", int param"+j;
+                    all += "param"+j+"*";
+                }
+                head += ")";
+                all += "1";
+
+                headerCode += head+";"+newLine();
+
+                identUp();
+                functionCode += head+" {"+newLine();
                 String c = "*";
                 for (int j = 1 ;j<i;j++) c += "*";
                 functionCode += "int"+c+" arr = malloc(size*param0);"+newLine();
@@ -280,12 +322,13 @@ public class CParser extends Parser {
                 }
                 functionCode += "GCNode* node = gc_malloc(0,&standardTrace);"+newLine();
                 functionCode += "node -> data = arr;"+newLine();
-                functionCode += "node -> size = "+all+";"+newLine();;
+                functionCode += "node -> size = size*"+all+";"+newLine();;
                 functionCode += "return node;"+newLine();
                 identDown();
                 functionCode += newLine();
                 functionCode += "}";
                 functionCode += newLine();
+                 */
             }
         }
         

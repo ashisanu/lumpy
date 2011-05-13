@@ -21,10 +21,24 @@ public class CExpressionArray extends ExpressionArray {
     public String generate() {
         try {
             String str = "";
-            Datatype d = new Datatype(var.getDatatype(),arrs.size(),null);
-            str += "(("+CExpressionAssignment.getArrayDatatype(d)+"*)("+var.generate()+" -> data))";
+            Datatype d;
+            if (arrs.size() == var.getVariable().getDatatype().getDimensions()) {
+                d = new Datatype(var.getDatatype(),arrs.size(),null);
+            } else {
+                d = new Datatype(Datatype.STRING_DATATYPE,arrs.size(),null);
+            }
+            //str += "("+dataStr+"("+var.generate()+" -> data))";
+            str += var.generate();
+            int i = 1;
             for (Expression e: arrs) {
+                if ( i == arrs.size()) {
+                    str = "(("+ CExpressionAssignment.getArrayDatatype(new Datatype(d,1,null))+"*)" + str + "-> data)";
+                } else {
+                    str = "((GCNode**)" + str + "-> data)";
+                }
                 str += "["+e.generate()+"]";
+
+                i++;
             }
             return str;
         } catch (SyntaxException ex) {}

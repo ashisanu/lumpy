@@ -5,6 +5,9 @@ import Compiler.Lexer.*;
 import Compiler.Parser.*;
 import Compiler.Parser.Expression.ExpressionManagerC;
 import Compiler.SyntaxException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -17,12 +20,11 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String input = Parser.readFile("file.ly");
-        String template = Parser.readFile("data/template_c");
+        String input = readFile("file.ly");
+        String template = readFile("data/template_c");
         try {
             System.out.flush();
             Parser mainParser = new CParser(new Lexer(input), new ExpressionManagerC(),"/");
-
             mainParser.compile();
             boolean notCompiled = true;
             while (notCompiled) {
@@ -54,7 +56,7 @@ public class Main {
 
                 mainParser.execute();
             } else {
-                throw new SyntaxException("",null,false);
+                throw new SyntaxException(null, "",null,false);
             }
         } catch (SyntaxException ex) {
             System.out.println(ex.genError());
@@ -62,5 +64,21 @@ public class Main {
         }
     }
 
-    
+    public static String readFile(String path) {
+        String input = "";
+        BufferedReader reader = null;
+        try {
+           reader = new BufferedReader(new FileReader(path));
+           String tmp = reader.readLine()+"\n";
+           while (tmp != null) {
+               input += tmp+"\n";
+               tmp = reader.readLine();
+           }
+           reader.close();
+        } catch (IOException ex) {
+            System.out.println("File not found: "+path);
+            ex.printStackTrace();
+        }
+        return input;
+    }
 }

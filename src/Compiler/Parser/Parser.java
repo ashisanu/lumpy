@@ -36,6 +36,7 @@ public abstract class Parser {
         "ensure",
         "require",
     };
+    private static Scope hyperScope = new Scope("hyperscope",null,null); //Dieser Scope gilt für alle
     private static Operator[] operators;
     private int maxPrio;
     private Token previous;
@@ -45,7 +46,6 @@ public abstract class Parser {
     private ExpressionManager man;
     private Lexer lexer;
     private Scope currentScope = null;
-    private Scope mainScope;
     private int ident = 0; //einrückung
     private Function currentFunction; //Die aktuelle Funktion, für die kompiliert wird
     private Class currentClass; //Die aktuelle Klasse
@@ -69,24 +69,16 @@ public abstract class Parser {
      * @param analyser
      */
     public Parser(Lexer lexer, ExpressionManager man, String filePath) throws SyntaxException {
-        SyntaxException.wasError = false;
+        if (lexer == null && man == null && filePath == null) return;
 
         int[] add = { //alle addierbaren
-            Datatype.BYTE_DATATYPE,
-            Datatype.DOUBLE_DATATYPE,
             Datatype.FLOAT_DATATYPE,
             Datatype.INT_DATATYPE,
-            Datatype.LONG_DATATYPE,
-            Datatype.SHORT_DATATYPE,
             Datatype.STRING_DATATYPE
         };
         int all[] = { //der rest
-            Datatype.BYTE_DATATYPE,
-            Datatype.DOUBLE_DATATYPE,
             Datatype.FLOAT_DATATYPE,
             Datatype.INT_DATATYPE,
-            Datatype.LONG_DATATYPE,
-            Datatype.SHORT_DATATYPE
         };
         int[] bool = {Datatype.BOOLEAN_DATATYPE};
         Operator[] o = {
@@ -159,8 +151,8 @@ public abstract class Parser {
 
         getNext();
 
-        currentScope = new Scope("mainScope",this,null);
-        mainScope = currentScope;
+        currentScope = new Scope("mainScope",this,hyperScope);
+
         while(iterator.hasNext()) {
             if (isToken("function") || isToken("class") || isToken("extension") || isToken("extern") || isToken("import") || isToken("language")) {
                 keyWord();
@@ -177,7 +169,9 @@ public abstract class Parser {
      */
     public void compile() throws SyntaxException {
         alreadyCompiled = true;
+
         
+
         //program kompilieren
         for (Function func: currentScope.getFunctions()) {
             if (func.getName().equals("program")) {
@@ -245,7 +239,6 @@ public abstract class Parser {
         boolean isMain = false;
         if (oldScope == null) {
             isMain = true;
-            mainScope = currentScope;
         }
         ExpressionBlock block = getManager().getBlockExpression(inGen);
 
@@ -271,7 +264,7 @@ public abstract class Parser {
                     fixError();
                 }
             } catch (Exception exc) {
-                System.out.println(new SyntaxException("Unknown error",getCurrent(),false).genError());
+                System.out.println(new SyntaxException(this, "Unknown error",getCurrent(),false).genError());
                 exc.printStackTrace(System.out);
             }
             //if (ex != null && ex instanceof ExpressionIf);
@@ -312,7 +305,7 @@ public abstract class Parser {
                         currentScope.newVariable(par);
                 }
 
-                currentScope.getFunctions().addAll(getMainScope().getFunctions());
+                currentScope.getFunctions().addAll(getHyperScope().getFunctions());
 
                 if (codeFunc.getStartToken() != null) {
                     iterator = tokens.listIterator( tokens.indexOf(codeFunc.getStartToken()) );
@@ -407,7 +400,7 @@ public abstract class Parser {
         inGenerator = tmpGen;
 
         if (duck != null) {
-            if (!duck.isDuck()) {
+            if (!duck.isDuck() || true) {
                 throw duck;
             }
             SyntaxException.wasError =  err;
@@ -451,10 +444,10 @@ public abstract class Parser {
                 cfunc.getScope().getOwnerClass().newMethod(cfunc.isPublic(), f, thisVar, superVar, cfunc.isStatic());
                 String tmpName = f.getName();
                 f.setName(cfunc.getScope().getOwnerClass().getName()+"_"+tmpName);
-                getMainScope().newFunction(f);
+                getHyperScope().newFunction(f);
                 f.setName(tmpName);
             } else {
-                getMainScope().newFunction(f);
+                getHyperScope().newFunction(f);
             }
 
             //for (Variable var: cfunc.getScope().getVariable) {
@@ -654,20 +647,8 @@ public abstract class Parser {
             }
             Expression min = null;
             switch (expr.getDatatype().getUnsafeID()) {
-                case Datatype.BYTE_DATATYPE:
-                    min = getManager().getByteExpression((byte)(-1));
-                    break;
-                case Datatype.SHORT_DATATYPE:
-                    min = getManager().getShortExpression((short)(-1));
-                    break;
                 case Datatype.INT_DATATYPE:
                     min = getManager().getIntegerExpression(-1);
-                    break;
-                case Datatype.LONG_DATATYPE:
-                    min = getManager().getLongExpression(-1);
-                    break;
-                case Datatype.DOUBLE_DATATYPE:
-                    min = getManager().getDoubleExpression(-1.0);
                     break;
                 case Datatype.FLOAT_DATATYPE:
                     min = getManager().getFloatExpression(-1.0f);
@@ -805,36 +786,10 @@ public abstract class Parser {
                 var = getManager().getVariableExpression(getScope().getVariable(getCurrent().getText()));
             } else if (isExtensionAccess) {
                 boolean find = false;
-                if (getCurrent().getText().length()> 1 && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("b")) {
-                    String t = getCurrent().getText().substring(0, getCurrent().getText().length() - 1);
-                    try { //Byte
-                        var = getManager().getByteExpression(new Byte(t));
-                        find = true;
-                    } catch (NumberFormatException ex) {
-                    }
-                }
-                if (!find && getCurrent().getText().length()> 1 && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("s")) {
-                    String t = getCurrent().getText().substring(0, getCurrent().getText().length() - 1);
-                    try { //Short
-                        var = getManager().getShortExpression(new Short(t));
-                        find = true;
-                    } catch (NumberFormatException ex) {
-                    }
-                }
 
                 if (!find && !getCurrent().getText().contains(".")) {
                     try { //integer
                         var = getManager().getIntegerExpression(new Integer(getCurrent().getText()));
-                        find = true;
-                    } catch (NumberFormatException ex) {
-                    }
-                }
-
-
-                if (!find && getCurrent().getText().length()> 1 && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("l")) {
-                    String t = getCurrent().getText().substring(0, getCurrent().getText().length() - 1);
-                    try { //Long
-                        var = getManager().getLongExpression(new Long(t));
                         find = true;
                     } catch (NumberFormatException ex) {
                     }
@@ -846,15 +801,7 @@ public abstract class Parser {
                     } catch (NumberFormatException ex) {
                     }
                 }
-                if (!find && getCurrent().getText().length()> 1 && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("d")) {
-                    String t = getCurrent().getText().substring(0, getCurrent().getText().length() - 1);
-                    try { //double
-                        var = getManager().getDoubleExpression(new Double(t));
-                    } catch (NumberFormatException ex) {
-                        if (getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("d")) {
-                        }
-                    }
-                }
+                
                 if (!find && getCurrent().getText().length() > 1 && getCurrent().getText().substring(0, 1).equals("\"") && getCurrent().getText().substring(getCurrent().getText().length() - 1).equals("\"")) {
                     var = getManager().getStringExpression(getCurrent().getText());
                 }
@@ -866,7 +813,7 @@ public abstract class Parser {
                     while(isToken("\n")) match("\n");
                     if (start) match(",");
                     Expression expr = operator(0);
-                    if (expr.getDatatype().getDimensions()>0) error("Auto array cannot contain arrays.");
+                    //if (expr.getDatatype().getDimensions()>0) error("Auto array cannot contain arrays.");
                     if (exprs.size()>0 && !exprs.getFirst().getDatatype().match(expr.getDatatype())) error("Auto array datatypes does not match.");
                     exprs.add(expr);
                     start = true;
@@ -1075,13 +1022,13 @@ public abstract class Parser {
             while (isToken("(") || isToken(".") || isToken("[") || var == null || var instanceof ExpressionMethod) {
                 if (isToken(".") && var != null) {
                     match(".");
-                    //omg es ist ein zugriff
-                    //schauen ob MetaClass
 
                     Datatype curData = var.getDatatype();
-                    if (curData.match(new Datatype(curData,0,null))) {
+                    if (curData.match(new Datatype(curData,0,null)) || Class.getClassByName(curData.toString())!= null) {
                         //okay, nun schauen ob es sich um eine methode oder attribut handelt.
-                        Class c = Class.getClassByName(curData.getName());
+                        String n = curData.getName();
+                        if (curData.getDimensions() > 0) n = curData.toString();
+                        Class c = Class.getClassByName(n);
                         boolean find = false;
                         //attribut:
                         for (Variable attribute:c.getAttibutes()) {
@@ -1331,16 +1278,6 @@ public abstract class Parser {
         return imp;
     }
     /**
-     * importieren
-     */
-    private void importParser(Import imp) throws SyntaxException {
-        if (imp.getParser() != null) {
-            for (Function func: imp.getParser().getMainScope().getFunctions()) {
-                getMainScope().newFunction(func);
-            }
-        }
-    }
-    /**
      * Der Wrapper, um before = null zu setzen
      */
     public Datatype datatype(boolean match,boolean funcDatatype) throws SyntaxException {
@@ -1536,7 +1473,7 @@ public abstract class Parser {
                 Variable vari = new Variable(name, datatype);
                 if (isRef) vari.reference();
                 
-                if (inGenerator) {
+                if (inGenerator && currentClass != null && currentClass.getTyp() != Class.IS_EXTENSION) {
                     if (currentClass.getAttibutes() != null) {
                         for (Variable att: currentClass.getAttibutes()) {
                             if (att.getName().equals(vari.getName()) && !att.getDatatype().match(vari.getDatatype())) {
@@ -1875,17 +1812,19 @@ public abstract class Parser {
                 //schaue in den lumpy ordner
                 path = System.getProperty("user.dir")+"/modules/"+name+".ly";
             }
+            String text = readFile(path);
             Import imp = null;
             for (Import imp2: Main.imports) {
-                if (imp2.getPath().equals(path)) {
+                if ((imp2.getText()!= null && imp2.getText().equals(text)) || path.equals(imp2.getPath())) {
                     imp = imp2;
                     break;
                 }
             }
+            
             if (imp == null) {
                 imp = newImport(path);
-                if (imp.getPath().endsWith(".ly")) {
-                    imp.setText(Parser.readFile(imp.getPath()));
+                if (imp.getPath().endsWith(".ly") && imp.getParser() == null) {
+                    imp.setText(text);
                     Parser parser = new CParser(new Lexer(imp.getText()),new ExpressionManagerC(),imp.getPath());
                     imp.setParser(parser);
                     //if (!dont) {
@@ -1896,7 +1835,7 @@ public abstract class Parser {
                     //importParser(imp2);
                 }
             }
-            importParser(imp);
+            
             return getManager().getEmptyExpression();
         } else if (isToken("class") || isToken("extension") || isToken("struct")) {
             
@@ -1969,9 +1908,11 @@ public abstract class Parser {
             } else {
                 name = getCurrent().getText();
             }
+            Datatype thisDatatype = null;
             //name = getCurrent().getText() + name;
             if (mode == Class.IS_EXTENSION) {
-                c = new Class(name,startToken,this);
+                thisDatatype = datatype(false,false);
+                c = new Class(thisDatatype.toString(),startToken,this);
                 Class.newClass(c);
             } else {
                 c = Class.getClassByName(name);
@@ -2032,13 +1973,11 @@ public abstract class Parser {
                 c.setSynonym(getCurrent().getText().replace("\"", ""));
                 getNext();
             }
-            match("\n");
+            if (mode != Class.IS_EXTENSION) match("\n");
             Scope tmp = currentScope;
             currentScope = new Scope(c.getName(),this, null);
-            Datatype thisDatatype = c;
-            if (mode == Class.IS_EXTENSION) {
-                thisDatatype = new Datatype(Datatype.Name2Int(c.getName()),0,null);
-            }
+            if (thisDatatype == null) thisDatatype = c;
+            
 
             Variable thisVar = new Variable("this",thisDatatype);
             Variable superVar =  null;
@@ -2141,7 +2080,7 @@ public abstract class Parser {
                             }
                             get.use();
                             c.newMethod(isPublic, get, thisVar, superVar,isStatic);
-                            getMainScope().newFunction(get);
+                            getHyperScope().newFunction(get);
 
                             compileFunction(get,null);
 
@@ -2168,7 +2107,7 @@ public abstract class Parser {
                                 }
                             }
                             c.newMethod(isPublic, set, thisVar, superVar,isStatic);
-                            getMainScope().newFunction(set);
+                            getHyperScope().newFunction(set);
 
                             compileFunction(set,null);
                             overJumpBlock();
@@ -2231,7 +2170,7 @@ public abstract class Parser {
                     func.setBlock(block);
                     c.newMethod(isPublic, func, thisVar, superVar,isStatic);
                     funcDecs.add(getManager().getFunctionDeclarationExpression(block, func));
-                    getMainScope().newFunction(func);
+                    getHyperScope().newFunction(func);
 
 
                     s = new Scope("",this,null);
@@ -2248,7 +2187,7 @@ public abstract class Parser {
                     func.setBlock(block);
                     c.newMethod(isPublic, func, thisVar, superVar,isStatic);
                     funcDecs.add(getManager().getFunctionDeclarationExpression(block, func));
-                    getMainScope().newFunction(func);
+                    getHyperScope().newFunction(func);
 
 
                     Datatype data = datatype(true,true);
@@ -2276,7 +2215,7 @@ public abstract class Parser {
                     match(")");
                     func.setStartToken(getCurrent());
                     c.newMethod(isPublic, func,thisVar,superVar,isStatic);
-                    getMainScope().newFunction(func);
+                    getHyperScope().newFunction(func);
                     func.notCallable();
 
                     
@@ -2291,7 +2230,6 @@ public abstract class Parser {
                     Expression expr = keyWord();
                     currentClass = c;
                     inExtern = tmpInExtern;
-                    //getMainScope().getFunctions().removeLast();
 
                     expr.setLine(getCurrent().getLine());
                     if (c.getTyp() != Class.IS_CLASS) {
@@ -2314,7 +2252,7 @@ public abstract class Parser {
 
                     String tmpName = lastFunc.getName();
                     lastFunc.setName(c.getName()+"_"+name);
-                    getMainScope().newFunction(lastFunc);
+                    getHyperScope().newFunction(lastFunc);
                     lastFunc.setName(tmpName);
 
                 } else {
@@ -2362,8 +2300,6 @@ public abstract class Parser {
             boolean anonymous = false;
             if (isToken(":")) {
                 anonymous = true;
-            } else if (getScope().getSuperScope() != null) {
-                error("Functions only allowed in main scope.");
             }
             LinkedList<Datatype> generics;
             if (isToken("<")) {
@@ -2493,9 +2429,9 @@ public abstract class Parser {
 
                 overJumpBlock();
             }
-            if (currentClass == null && !anonymous) getMainScope().newFunction(func);
+            if (currentClass == null && !anonymous) getHyperScope().newFunction(func);
             if (anonymous) {
-                getMainScope().getFunctions().add(func);
+                getHyperScope().getFunctions().add(func);
                 compileFunction(func,null);
                 return getManager().getAnonymousFuncExpression((CodeFunction)func);
             } else {
@@ -2519,9 +2455,6 @@ public abstract class Parser {
             match("increment");
             return getManager().getIncDecExpression(variableExpression(), inc);
         } else if (isToken("return")) {
-            if (getScope().getSuperScope() == null) {
-                error("Return only allowed in function.");
-            }
             match("return");
 
             Datatype data = currentFunction.getDatatype();
@@ -2559,9 +2492,6 @@ public abstract class Parser {
                 return getManager().getEmptyExpression();
             }
         } else if (isToken("extern")) {
-            if (getScope().getSuperScope() != null) {
-                error("Extern only allowed in main scope.");
-            }
             inExtern = true;
             match("extern");
             if (isToken("do")) {
@@ -2656,7 +2586,7 @@ public abstract class Parser {
     public void error(String msg) throws SyntaxException {
         Token current = this.current;
         if (current == null) current = new Token("Unknown","Unknown line",41,42);
-        SyntaxException ex = new SyntaxException(msg, current,false);
+        SyntaxException ex = new SyntaxException(this, msg, current,false);
         System.out.print(ex.toString());
 
         SyntaxException.wasError = true;
@@ -2668,7 +2598,7 @@ public abstract class Parser {
     public void error(String msg,boolean duck) throws SyntaxException {
         Token current = this.current;
         if (current == null) current = new Token("Unknown","Unknown line",41,42);
-        SyntaxException ex = new SyntaxException(msg, current,duck);
+        SyntaxException ex = new SyntaxException(this, msg, current,duck);
         System.out.print(ex.toString());
 
         SyntaxException.wasError = true;
@@ -2753,12 +2683,7 @@ public abstract class Parser {
         return currentScope;
     }
 
-    /**
-     * gibt den hauptscope zurück
-     */
-    public Scope getMainScope() {
-        return mainScope;
-    }
+    
 
     /**
      * Setzt den aktuellen Token (achtung, vorsichtig verwenden)
@@ -2791,7 +2716,7 @@ public abstract class Parser {
      * @param path
      * @return
      */
-    public static String readFile(String path) {
+    public String readFile(String path) throws SyntaxException {
         String input = "";
         BufferedReader reader = null;
         try {
@@ -2803,7 +2728,7 @@ public abstract class Parser {
            }
            reader.close();
         } catch (IOException ex) {
-            System.err.println("File not found. "+path);
+            error("File not found: "+path);
             ex.printStackTrace();
         }
         return input;
@@ -2821,5 +2746,12 @@ public abstract class Parser {
      */
     public boolean isInGenerator() {
         return inGenerator;
+    }
+
+    /**
+     * Gibt den "Hyperscope" zurück. In diesem Scope sind _alle_ funktionen drinnen
+     */
+    public Scope getHyperScope() {
+        return hyperScope;
     }
 }

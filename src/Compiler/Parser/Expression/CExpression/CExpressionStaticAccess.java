@@ -15,6 +15,6 @@ public class CExpressionStaticAccess extends ExpressionStaticAccess {
 
     @Override
     public String generate() {
-        return "__static__"+c.getName();
+        return "__static__"+c.toString();
     }
 }

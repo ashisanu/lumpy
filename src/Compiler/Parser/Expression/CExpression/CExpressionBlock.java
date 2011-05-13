@@ -47,7 +47,7 @@ public class CExpressionBlock extends ExpressionBlock {
             getParser().identUp();
             String v = "";
             if (CExpressionFunctionDeclaration.currentFunction != null && CExpressionFunctionDeclaration.currentFunction.isStatic()) {
-                v = "__static__"+c.getName()+"__status_";
+                v = "__static__"+c.toString()+"__status_";
             } else {
                 v = "(("+c.toString()+"*)_this_ -> data) -> _status_";
             }

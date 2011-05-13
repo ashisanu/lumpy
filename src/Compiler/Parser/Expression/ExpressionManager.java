@@ -29,27 +29,11 @@ public abstract class ExpressionManager {
     /**
      * Erstellt eine Zahl
      */
-    public abstract ExpressionByte getByteExpression(byte num);
-    /**
-     * Erstellt eine Zahl
-     */
-    public abstract ExpressionShort getShortExpression(short num);
-    /**
-     * Erstellt eine Zahl
-     */
-    public abstract ExpressionLong getLongExpression(long num);
-    /**
-     * Erstellt eine Zahl
-     */
     public abstract ExpressionFloat getFloatExpression(float num);
     /**
      * Erstellt eine Zahl
      */
     public abstract ExpressionBoolean getBooleanExpression(boolean num);
-    /**
-     * Erstellt eine Zahl
-     */
-    public abstract ExpressionDouble getDoubleExpression(double num);
     /**
      * Erstellt eine Zahl
      */
