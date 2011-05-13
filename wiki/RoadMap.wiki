@@ -6,8 +6,8 @@ Lumpy is a fast growing language. There are several things to do.
 Lumpy uses a "milestone system". Every milestone is an important point in the development of the project.
 
 = Details =
- * Milestone 0: (Current): Implement _core_ features.
- * Milestone 1: Implement all language features (look at "future syntax")
+ * Milestone 0: ~~Implement _core_ features.~~
+ * Milestone 1: (Current) Implement all language features (look at "future syntax")
  * Milestone 2: Simple standard library for input/output, datastructures and general bugfixing
  * Milestone 3: Compile and execute under linux and Mac OS X
  * Milestone 4: Libraries for:
@@ -25,3 +25,5 @@ Lumpy uses a "milestone system". Every milestone is an important point in the de
  * Milestone 5: Simple IDE
  * Milestone 6: New platform: GP2X Wiz and Open Pandora with all Libraries (except GUI for GP2X Wiz).
  * Milestone 7: Fixing bugs bugs bugs and more bugs.
+ * Milestone 8: XML Output (open it up for other languages)
+ * Milestone 9: Bootstrap the compiler
