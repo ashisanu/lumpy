@@ -114,7 +114,7 @@ public class Class extends Datatype {
             }
 
             if (!isStatic) cfunc.getScope().setClass(this);
-            cfunc.setSynonym(getName()+"_"+cfunc.getName());
+            cfunc.setSynonym(toString().replace("[]", "_dim")+"_"+cfunc.getName());
 
             
             if (!isStatic) cfunc.getScope().newVariable(thisVar);
@@ -268,4 +268,6 @@ public class Class extends Datatype {
     public int getMode() {
         return mode;
     }
+
+    
 }

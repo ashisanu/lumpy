@@ -10,16 +10,12 @@ import java.util.LinkedList;
  */
 public class Datatype {
     public static final int INT_DATATYPE    = 100;
-    public static final int LONG_DATATYPE   = 101;
-    public static final int BYTE_DATATYPE   = 102;
-    public static final int SHORT_DATATYPE  = 103;
-    public static final int FLOAT_DATATYPE  = 104;
-    public static final int DOUBLE_DATATYPE = 105;
-    public static final int STRING_DATATYPE = 106;
-    public static final int VOID_DATATYPE   = 107;
-    public static final int BOOLEAN_DATATYPE= 108;
-    public static final int FUNC_DATATYPE   = 109;
-    public static final int NULL_DATATYPE   = 110;
+    public static final int FLOAT_DATATYPE  = 101;
+    public static final int STRING_DATATYPE = 102;
+    public static final int VOID_DATATYPE   = 103;
+    public static final int BOOLEAN_DATATYPE= 104;
+    public static final int FUNC_DATATYPE   = 105;
+    public static final int NULL_DATATYPE   = 106;
     
     private static LinkedList<Class> classes = new LinkedList<Class>();
     /**
@@ -60,20 +56,8 @@ public class Datatype {
         if (name.equals("int"))
             return INT_DATATYPE;
 
-        if (name.equals("byte"))
-            return BYTE_DATATYPE;
-
-        if (name.equals("short"))
-            return SHORT_DATATYPE;
-
-        if (name.equals("long"))
-            return LONG_DATATYPE;
-
         if (name.equals("float"))
             return FLOAT_DATATYPE;
-
-        if (name.equals("double"))
-            return DOUBLE_DATATYPE;
 
         if (name.equals("boolean"))
             return BOOLEAN_DATATYPE;
@@ -120,20 +104,8 @@ public class Datatype {
             case INT_DATATYPE:
                 name = "int";
                 break;
-            case LONG_DATATYPE:
-                name = "long";
-                break;
-            case SHORT_DATATYPE:
-                name = "short";
-                break;
-            case BYTE_DATATYPE:
-                name = "byte";
-                break;
             case FLOAT_DATATYPE:
                 name = "float";
-                break;
-            case DOUBLE_DATATYPE:
-                name = "double";
                 break;
             case STRING_DATATYPE:
                 name = "string";
@@ -185,13 +157,18 @@ public class Datatype {
 
         return str;
     }
-
+    /**
+     * Zwei Datentypen gleich (kurz)
+     */
+    public boolean match(Datatype data) {
+        return match(data,false);
+    }
     /**
      * Haben zwei Datentypen denselben Inhalt?
      * @param data
      * @return
      */
-    public boolean match(Datatype data) {
+    public boolean match(Datatype data, boolean ignoDim) {
         if (data == null) return true;
         if (data.getID() == Datatype.NULL_DATATYPE && (this.getDimensions()>0 || this.getParameters() != null || this.getID()>=1000 || this.getID() == Datatype.STRING_DATATYPE)) {
             return true;
@@ -216,7 +193,7 @@ public class Datatype {
             return false;
         }
 
-        if (getID() == data.getID() && data.dimensions == dimensions) {
+        if (getID() == data.getID() && (data.dimensions == dimensions || ignoDim)) {
             return true;
         } else {
             return false;
@@ -236,25 +213,14 @@ public class Datatype {
      * Erstellt die Standard 0 Expression für den Datentyp
      */
     public Expression createDatatypeExpression(ExpressionManager m) {
+        if (getParameters() != null || getDimensions()>0) return m.getNullExpression();
         switch (id) {
             case VOID_DATATYPE:
-                if (getParameters() != null) {
-                    return m.getNullExpression();
-                }   else {
-                    return null;
-                }
+                return null;
             case INT_DATATYPE:
                 return m.getIntegerExpression(0);
-            case BYTE_DATATYPE:
-                return m.getByteExpression((byte)0);
-            case SHORT_DATATYPE:
-                return m.getShortExpression((short)0);
-            case LONG_DATATYPE:
-                return m.getLongExpression((long)0);
             case FLOAT_DATATYPE:
                 return m.getFloatExpression(0.0f);
-            case DOUBLE_DATATYPE:
-                return m.getDoubleExpression(0.0);
             case STRING_DATATYPE:
                 return m.getStringExpression("\"\"");
             case BOOLEAN_DATATYPE:

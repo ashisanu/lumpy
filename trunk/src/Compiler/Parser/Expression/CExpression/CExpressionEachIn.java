@@ -43,12 +43,14 @@ public class CExpressionEachIn extends ExpressionEachIn {
         getParser().identUp();
         str += getParser().newLine();
         str += init.generate()+";"+getParser().newLine();
-        str += startFunc.generateFuncName()+"("+in.generate()+");"+getParser().newLine();
-        String inv = var.generate()+" = "+invokeFunc.generateFuncName()+"("+in.generate()+");"+getParser().newLine();
+        String name = "tmp_it_"+this.in.getVariable().getName();
+        str += "GCNode* "+name+" = " + in.generate() + ";"+getParser().newLine();
+        str += startFunc.generateFuncName()+"("+name+");"+getParser().newLine();
+        String inv = var.generate()+" = "+invokeFunc.generateFuncName()+"("+name+");"+getParser().newLine();
 
         getParser().identUp();
         str += inv;
-        str += "while ("+hasNextFunc.generateFuncName()+"("+in.generate()+")) {"+getParser().newLine();
+        str += "while ("+hasNextFunc.generateFuncName()+"("+name+")) {"+getParser().newLine();
         str += block.generate();
         getParser().identDown();
         str += getParser().newLine();

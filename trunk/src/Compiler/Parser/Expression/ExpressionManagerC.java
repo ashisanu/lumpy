@@ -36,32 +36,8 @@ public class ExpressionManagerC extends ExpressionManager {
     /**
      * Erstellt eine Zahl Expression in c
      */
-    public ExpressionByte getByteExpression(byte num) {
-        return new CExpressionByte(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
-    public ExpressionShort getShortExpression(short num) {
-        return new CExpressionShort(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
-    public ExpressionLong getLongExpression(long num) {
-        return new CExpressionLong(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
     public ExpressionFloat getFloatExpression(float num) {
         return new CExpressionFloat(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
-    public ExpressionDouble getDoubleExpression(double num) {
-        return new CExpressionDouble(getParser(),num);
     }
     /**
      * Erstellt eine Zahl Expression in c

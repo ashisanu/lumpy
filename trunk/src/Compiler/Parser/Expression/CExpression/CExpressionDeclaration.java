@@ -1,6 +1,5 @@
 package Compiler.Parser.Expression.CExpression;
 
-import Compiler.Datatype;
 import Compiler.Parser.Expression.Expression;
 import Compiler.Parser.Expression.ExpressionDeclaration;
 import Compiler.Parser.Expression.ExpressionEmpty;
@@ -31,7 +30,7 @@ public class CExpressionDeclaration extends ExpressionDeclaration {
             Variable var = getDecVar().get(i);
             if ((var.isUsed() || !(getValues().get(i) instanceof ExpressionEmpty))) {
                 Expression expr = getValues().get(i);
-                if (!onlySet) {
+                if (!onlySet || (c != null && c.getTyp() == Class.IS_EXTENSION)) {
                     str += CExpressionAssignment.getDatatype(var.getDatatype())+" ";
                 } else if (c != null) {
                     String datatype = c.toString()+"*";

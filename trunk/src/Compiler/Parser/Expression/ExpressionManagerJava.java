@@ -29,32 +29,8 @@ public class ExpressionManagerJava {//extends ExpressionManager {
     /**
      * Erstellt eine Zahl Expression in c
      */
-    public ExpressionByte getByteExpression(byte num) {
-        return null;//new JavaExpressionByte(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
-    public ExpressionShort getShortExpression(short num) {
-        return null;//new JavaExpressionShort(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
-    public ExpressionLong getLongExpression(long num) {
-        return null;//new JavaExpressionLong(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
     public ExpressionFloat getFloatExpression(float num) {
         return null;//new JavaExpressionFloat(getParser(),num);
-    }
-    /**
-     * Erstellt eine Zahl Expression in c
-     */
-    public ExpressionDouble getDoubleExpression(double num) {
-        return null;//new JavaExpressionDouble(getParser(),num);
     }
     /**
      * Erstellt eine Zahl Expression in c

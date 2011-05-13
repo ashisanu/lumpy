@@ -29,7 +29,7 @@ public class CExpressionAccess extends ExpressionAccess {
                 } else if (left instanceof ExpressionStaticAccess) {
                     return left.generate()+"_" + right.generate();
                 } else {
-                    String datatype = left.getDatatype().toString();
+                    String datatype = CExpressionAssignment.getRealDatatype(left.getDatatype());
                     if (left.getDatatype().isClass()) datatype += "*";
                     return "((("+datatype+")"+left.generate()+" -> data) -> "+right.generate()+")";
                 }

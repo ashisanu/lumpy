@@ -1,4 +1,7 @@
 package Compiler;
+
+import Compiler.Parser.Parser;
+
 /**
  * Ein Syntaxfehler in der Datei
  * @author Coolo
@@ -8,16 +11,17 @@ public class SyntaxException extends Exception {
     private String text;
     private Token token;
     private boolean duck;
+    private Parser parser;
 
     /**
      * Erstellt eine neue Syntax Exception.
      * @param text
      * @param token
      */
-    public SyntaxException(String text, Token token, boolean duck) {
+    public SyntaxException(Parser p, String text, Token token, boolean duck) {
         this.text = text;
         this.token = token;
-        this.duck = duck;
+        this.parser = p;
     }
 
     public String toString() {
@@ -32,8 +36,11 @@ public class SyntaxException extends Exception {
 
         str += "Syntax error: -------------------------------------------------------\n";
         str += "\tMessage: '"+text.replace("\n", "NEWLINE").trim()+"'\n";
-        if (token != null) str += "\tLine: '"+token.getLine()+"' Character: '"+token.getPos()+"' at token '"+token.getText().replace("\n", "NEWLINE")+"'\n";
-        if (token != null) str += "\tContent: '"+token.getWholeLine()+"'\n";
+        if (token != null ) {
+            str += "\tLine: '"+token.getLine()+"' Character: '"+token.getPos()+"' at token '"+token.getText().replace("\n", "NEWLINE")+"'\n";
+            str += "\tContent: '"+token.getWholeLine()+"'\n";
+            str += "\tFile: '"+parser.getPath()+"'\n";
+        }
         str += "---------------------------------------------------------------------\n";
 
         return str;

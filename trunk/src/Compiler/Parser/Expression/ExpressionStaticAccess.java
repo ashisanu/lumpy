@@ -19,7 +19,7 @@ public abstract class ExpressionStaticAccess extends ExpressionIdentifier {
     @Override
     public Variable getVariable() {
         try {
-            Variable v = new Variable(c.getName(),getDatatype());
+            Variable v = new Variable(c.toString(),getDatatype());
             return v;
         } catch(SyntaxException ex) {}
         return null;
