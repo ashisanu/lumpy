@@ -238,10 +238,8 @@ end
 {{{
 extern
     function func:void(lol1:float,lol:string) //no type inference
-    // does not work yet
-    var test:int
     struct test //no inheritance allowed
-        var test:int, lol:float  //only public
+        var test:int, lol:float
         function method()
         end
     end
