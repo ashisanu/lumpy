@@ -1,7 +1,7 @@
 #include "GC.h"
 #include "exception.h"
 
-GCNode* sliceArray(GCNode* node, int start, int end, int dataSize) {
+GCNode* sliceArray(GCNode* node, int start, int end, int dataSize, char addNull) {
     if (end == 0) {
         end = node -> size;
     }
@@ -18,12 +18,17 @@ GCNode* sliceArray(GCNode* node, int start, int end, int dataSize) {
     int newSize = end - start;
     if (newSize>=0) {
         newSize = newSize*dataSize;
-        GCNode* newNode = gc_malloc(newSize, node->trace);
+        GCNode* newNode = gc_malloc(newSize + addNull, node->trace);
         int i = 0;
         for (i = 0; i < newSize; i++) {
-            //printf("%d posi old: %d posi new:%d\n",((int*)node->data)[i],i,i - start);
-            //if ((i + start*dataSize) >= node->size) throwSliceException();
-            ((char*)newNode->data) [i] = ((char*)node->data)[i + start*dataSize];
+            if (i > node -> size) {
+                ((char*)newNode->data) [i] = 0;
+            } else {
+                ((char*)newNode->data) [i] = ((char*)node->data)[i + start*dataSize];
+            }
+        }
+        if (addNull) {
+            ((char*)newNode->data)[newSize] = '\0';
         }
         return newNode;
     } else {

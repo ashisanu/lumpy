@@ -80,18 +80,23 @@ public abstract class Parser {
             Datatype.FLOAT_DATATYPE,
             Datatype.INT_DATATYPE,
         };
+        int allbool[] = { //der rest
+            Datatype.FLOAT_DATATYPE,
+            Datatype.INT_DATATYPE,
+            Datatype.BOOLEAN_DATATYPE
+        };
         int[] bool = {Datatype.BOOLEAN_DATATYPE};
         Operator[] o = {
-            new Operator("<","less", 3, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator(">","greater", 3, all,Datatype.BOOLEAN_DATATYPE),
-            new Operator("!=","unequal", 3, add,Datatype.BOOLEAN_DATATYPE),
+            new Operator("<","less", 3, allbool,Datatype.BOOLEAN_DATATYPE),
+            new Operator(">","greater", 3, allbool,Datatype.BOOLEAN_DATATYPE),
+            new Operator("!=","unequal", 3, allbool,Datatype.BOOLEAN_DATATYPE),
             new Operator("+","plus", 5, add),
             new Operator("-","minus", 5, all),
             new Operator("*","mul", 10, all),
             new Operator("/","div", 10, all),
-            new Operator("<=","lessequ", 3, add,Datatype.BOOLEAN_DATATYPE),
-            new Operator(">=","gretequ", 3, add,Datatype.BOOLEAN_DATATYPE),
-            new Operator("==","equal", 3, add,Datatype.BOOLEAN_DATATYPE),
+            new Operator("<=","lessequ", 3, allbool,Datatype.BOOLEAN_DATATYPE),
+            new Operator(">=","gretequ", 3, allbool,Datatype.BOOLEAN_DATATYPE),
+            new Operator("==","equal", 3, allbool,Datatype.BOOLEAN_DATATYPE),
             new Operator("and","and", 1, bool,Datatype.BOOLEAN_DATATYPE),
             new Operator("or","or", 1, bool,Datatype.BOOLEAN_DATATYPE),
             new Operator("xor","xor", 1, bool,Datatype.BOOLEAN_DATATYPE),
@@ -173,7 +178,7 @@ public abstract class Parser {
         
 
         //program kompilieren
-        for (Function func: currentScope.getFunctions()) {
+        for (Function func: hyperScope.getFunctions()) {
             if (func.getName().equals("program")) {
                 func.use();
                 compileFunction(func, null);
@@ -182,21 +187,21 @@ public abstract class Parser {
         }
 
         //alle nicht kompilierten aber benutzten funktionen kompilieren
-        for (Function func: currentScope.getFunctions()) {
+        for (Function func: hyperScope.getFunctions()) {
             if (func.isUsed() && !func.isCompiled()) {
                 compileFunction(func, null);
             }
         }
 
         //nun alle unbenutzen Funktionen löschen
-        ListIterator<Function> it = currentScope.getFunctions().listIterator();
+        ListIterator<Function> it = hyperScope.getFunctions().listIterator();
         while (it.hasNext()) {
             if (!it.next().isUsed()) it.remove();
         }
 
         //marke alle überladene funktionen als überladen
-        for (Function func1 : currentScope.getFunctions()) {
-            for (Function func2 : currentScope.getFunctions()) {
+        for (Function func1 : hyperScope.getFunctions()) {
+            for (Function func2 : hyperScope.getFunctions()) {
                 if (func1 != func2 && func1.getName().equals(func2.getName())) {
                     if (func1.getSynonym().equals(func2.getSynonym())) {
                         func1.overloadSynonym();
@@ -480,17 +485,7 @@ public abstract class Parser {
             return expr;
         }
 
-
-        expr = factor();
-        if (expr != null) {
-            if (isMain) {
-                error("No factor in main scope.");
-            }
-            if (expr instanceof ExpressionNew || expr instanceof ExpressionCast || expr instanceof ExpressionAccess) {
-                return expr;
-            }
-            expr = null;
-        }
+        //hier war factor()
         
         error("Unknown/Unexpected expression.");
         
@@ -781,9 +776,20 @@ public abstract class Parser {
             isExtensionAccess = true;
         } catch (NumberFormatException ex) {}
         
-        if (getScope().getVariable(getCurrent().getText())!=null || getScope().getFunction(getCurrent().getText()) != null || Datatype.Name2Int(getCurrent().getText()) != -1 || isToken("new") || isToken("function") || isExtensionAccess || isToken("[")) {
+        if (getScope().getVariable(getCurrent().getText())!=null || getScope().getFunction(getCurrent().getText()) != null || Datatype.Name2Int(getCurrent().getText()) != -1 || isToken("new") || isToken("function") || isExtensionAccess || isToken("[") || isToken("(")) {
             if (var == null && getScope().getVariable(getCurrent().getText()) != null) {
                 var = getManager().getVariableExpression(getScope().getVariable(getCurrent().getText()));
+            } else if (isToken("(")) {
+                Token tok = getCurrent();
+                match("(");
+                Expression expr = operator(0);
+                match(")");
+                if (expr instanceof ExpressionIdentifier) {
+                    var = (ExpressionIdentifier)expr;
+                } else {
+                    while(getCurrent() != tok) getPrevious();
+                    return null;
+                }
             } else if (isExtensionAccess) {
                 boolean find = false;
 
@@ -978,7 +984,7 @@ public abstract class Parser {
                             }
                         }
 
-                        if (expr.getDatatype().isClass()) {
+                        if (expr.getDatatype().isClass() && !expr.getDatatype().match(new Datatype(Datatype.STRING_DATATYPE,expr.getDatatype().getDimensions(),expr.getDatatype().getParameters()))) {
                             //schauen ob dorthingecastet werden kann
                             Class c = (Class)Class.getClassByName(expr.getDatatype().getName());
                             boolean find = false;
@@ -1066,7 +1072,9 @@ public abstract class Parser {
                                 //schauen ob property
                                 for (Property p:c.getPropertys()) {
                                     if (isToken(p.getName())) {
+                                        p.compile(this);
                                         var = getManager().getPropertyExpression(p, var);
+                                        
                                         find = true;
                                         props.add((ExpressionProperty)var);
                                         getNext();
@@ -1100,6 +1108,20 @@ public abstract class Parser {
                                 expr2 = operator(0);
                             }
                         }
+                        Datatype d = new Datatype(Datatype.INT_DATATYPE,0,null);
+                        
+                        if (expr1 != null && !expr1.getDatatype().match(d)) {
+                            error("Left slice expression must be integer, and not "+expr1.getDatatype().toString());
+                        }
+                        if (expr2 != null && !expr2.getDatatype().match(d)) {
+                            error("Right slice expression must be integer, and not "+expr2.getDatatype().toString());
+                        }
+                        if (var.getDatatype().getDimensions()>0 || var.getDatatype().match(new Datatype(Datatype.STRING_DATATYPE,0,null)));
+                        else {
+                            if (Class.getClassByName(var.getDatatype().getName()) == null || Class.getClassByName(var.getDatatype().getName()).getProperty() == null) {
+                                error("Expecting array or string to slice.");
+                            }
+                        }
                         if (slice) {
                             var = getManager().getSliceExpression(var, expr1, expr2);
                             
@@ -1117,6 +1139,7 @@ public abstract class Parser {
                                 if (c.getProperty() != null) {
                                     var = getManager().getPropertyExpression(c.getProperty(), var);
                                     p = c.getProperty();
+                                    
                                 }
                             }
                         }
@@ -1236,8 +1259,8 @@ public abstract class Parser {
                 }
                 if (var.getVariable().getDatatype() == null) {
                     var.getVariable().setDatatype(expr.getDatatype());
-                } else if (expr instanceof ExpressionIdentifier && ((ExpressionIdentifier)expr).getVariable()!= null) {
-                    ((ExpressionIdentifier)expr).getVariable().setDatatype(var.getVariable().getDatatype());
+                } else if (expr instanceof ExpressionIdentifier && ((ExpressionIdentifier)expr).getVariable()!= null && ((ExpressionIdentifier)expr).getVariable().getDatatype() == null) {
+                    ((ExpressionIdentifier)expr).getVariable().setDatatype(var.getDatatype());
                 }
                 
 
@@ -1734,56 +1757,75 @@ public abstract class Parser {
                 } else if (isToken("in")) {
                     match("in");
                     ExpressionIdentifier in = variableExpression();
-                    if (in.getDatatype() != null) {
-                        Class c = Class.getClassByName(in.getDatatype().getName());
-                        if (c != null) {
-                            //schauen ob es eine invoke methode gibt
-                            int find = 0;
-                            Function invFunc = null;
-                            for (Function func: c.getMethods()) {
-                                if (func.getName().equals("invoke") && func.getParameter().size() == 0) {
-                                    find ++;
-                                    invFunc = func;
-                                    func.use();
+                    do {
+                        if (in.getDatatype() != null) {
+                            Class c = Class.getClassByName(in.getDatatype().toString());
+                            if (c != null) {
+                                //schauen ob es eine invoke methode gibt
+                                int find = 0;
+                                Function invFunc = null;
 
-                                    compileFunction(func,null);
-                                }
-                                if (func.getName().equals("hasnext") && func.getParameter().size() == 0 && func.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
-                                    find ++;
-                                    func.use();
-                                }
-                                if (func.getName().equals("start") && func.getParameter().size() == 0) {
-                                    find ++;
-                                    func.use();
-                                }
-                            }
-                            if (find == 3) {
-                                Token tmp = getCurrent();
-                                while (getPrev() != last);
-                                getNext();
-                                if (isToken("var")) getNext();
-                                //braucht den expressionidentifier der variable...
-                                //es ist so ein böser hack... das sollte verboten werden
+                                find = 0;
+                                Function itFunc = null;
+                                for (Function func: c.getMethods()) {
+                                    if (func.getName().equals("invoke") && func.getParameter().size() == 0) {
+                                        find ++;
+                                        invFunc = func;
+                                        func.use();
 
-                                ExpressionIdentifier var = null;
-                                var = variableExpression();
-                                var.getVariable().setDatatype(invFunc.getDatatype());
-                                //zurück
-                                while (getNext() != tmp);
-                                //getNext();
-                                ExpressionBlock block = block(false);
-                                inLoop = bef;
-                                currentScope = tmpScope;
-                                return getManager().getEachInExpression(c,block, var, in, start);
+                                        compileFunction(func,null);
+                                    }
+                                    if (func.getName().equals("hasnext") && func.getParameter().size() == 0 && func.getDatatype().match(new Datatype(Datatype.BOOLEAN_DATATYPE,0,null))) {
+                                        find ++;
+                                        func.use();
+                                    }
+                                    if (func.getName().equals("start") && func.getParameter().size() == 0) {
+                                        find ++;
+                                        func.use();
+                                    }
+                                    if (func.getName().equals("iterator") && func.getParameter().size() == 0) {
+                                        itFunc = func;
+                                    }
+                                }
+                                if (find != 3 && itFunc != null) {
+                                    LinkedList<Function> list = new LinkedList<Function>();
+                                    list.add(itFunc);
+                                    ExpressionFunctionCall call = functionCall("iterator", list, new LinkedList<Expression>(), true);
+                                    call.getParameter().addFirst(in);
+                                    in = call;
+                                    continue;
+                                }
+
+
+                                if (find == 3) {
+                                    Token tmp = getCurrent();
+                                    while (getPrev() != last);
+                                    getNext();
+                                    if (isToken("var")) getNext();
+                                    //braucht den expressionidentifier der variable...
+                                    //es ist so ein böser hack... das sollte verboten werden
+
+                                    ExpressionIdentifier var = null;
+                                    var = variableExpression();
+                                    var.getVariable().setDatatype(invFunc.getDatatype());
+                                    //zurück
+                                    while (getNext() != tmp);
+                                    //getNext();
+                                    ExpressionBlock block = block(false);
+                                    inLoop = bef;
+                                    currentScope = tmpScope;
+                                    return getManager().getEachInExpression(c,block, var, in, start);
+                                } else {
+                                    error("Could not find method 'invoke', 'hasnext' or 'start'.");
+                                }
                             } else {
-                                error("Could not find method 'invoke', 'hasnext' or 'start'.");
+                                error("Cannot iterate through primitve datatype.");
                             }
                         } else {
-                            error("Cannot iterate through primitve datatype.");
+                            error("Cannot specify datatype.");
                         }
-                    } else {
-                        error("Cannot specify datatype.");
-                    }
+                        break;
+                    } while (true);
                 } else {
                     ExpressionBlock block = block(false);
                     inLoop = bef;
@@ -2027,118 +2069,140 @@ public abstract class Parser {
                         c.newAttribute(isPublic, var, isStatic);
                     }
                     c.getStartDecs().add(dec);
-                } else if (isToken("property")  && mode != Class.IS_EXTENSION) {
+                } else if (isToken("property")) {
                     match("property");
-                    
-                    LinkedList<Variable> indexer = null;
-                    if (isToken("[")) {
-                        indexer = new LinkedList<Variable>();
-                        while (isToken("[")) {
-                            match("[");
-                            String indexerName = getCurrent().getText();
-                            getNext();
-                            Datatype indexerData = null;
-                            if (isToken(":")) {
-                                indexerData = datatype(true, false);
-                            }
-                            indexer.add(new Variable(indexerName,indexerData));
-                            match("]");
+                    if (mode == Class.IS_EXTENSION) {
+                        String propName = getCurrent().getText();
+                        CodeFunction get = null;
+                        getNext();
+                        Datatype data = null;
+                        if (isToken(":")) data = datatype(true, false);
+                        
+                        get = new CodeFunction("get_"+propName,data,new Scope("",this,null));
+                        get.setStartToken(getCurrent());
+                        get.setTyp(CodeFunction.IS_PROPERTY_GET);
+                        get.use();
+                        c.newMethod(isPublic, get, thisVar, superVar,isStatic);
+                        getHyperScope().newFunction(get);
+
+                        //compileFunction(get,null);
+
+                        if (get.getDatatype() != null) {
+                            data = get.getDatatype();
                         }
-                    }
-                    String propName = getCurrent().getText();
-                    for (Property p: c.getPropertys()) {
-                        if (p.getName().equals(propName)) {
-                            error("Property '"+p.getName()+"' already exists.");
-                        }
-                    }
-                    getNext();
-                    
-                    Datatype data = null;
-                    if (isToken(":")) {
-                        data = datatype(true,false);
-                    }
 
-                    CodeFunction set = null, get = null;
-                    
-                    
-                    
-                    while (!isToken("end")) {                        
-                        if (isToken("get")) {
-                            match("get");
-
-                            
-
-                            if (get != null) error("Duplicate get property.");
-                            
-                            get = new CodeFunction("get_"+propName,data,new Scope("",this,null));
-                            get.setStartToken(getCurrent());
-                            get.setTyp(CodeFunction.IS_PROPERTY_GET);
-                            if (indexer != null) {
-                                for (Variable index:indexer) {
-                                    get.getParameter().add(index);
-                                }
-                            }
-                            get.use();
-                            c.newMethod(isPublic, get, thisVar, superVar,isStatic);
-                            getHyperScope().newFunction(get);
-
-                            compileFunction(get,null);
-
-                            if (get.getDatatype() != null) {
-                                data = get.getDatatype();
-                            }
-
-                            overJumpBlock();
-                        } else if (isToken("set")) {
-                            match("set");
-                            
-                            
-
-                            if (set != null) error("Duplicate set property.");
-
-                            set = new CodeFunction("set_"+propName,new Datatype(Datatype.VOID_DATATYPE,0,null),new Scope("",this,null));
-                            Variable v = set.newParameter(this,"value", null,null);
-                            set.setStartToken(getCurrent());
-                            set.setTyp(CodeFunction.IS_PROPERTY_SET);
-                            set.use();
-                            if (indexer != null) {
-                                for (Variable index:indexer) {
-                                    set.getParameter().add(index);
-                                }
-                            }
-                            c.newMethod(isPublic, set, thisVar, superVar,isStatic);
-                            getHyperScope().newFunction(set);
-
-                            compileFunction(set,null);
-                            overJumpBlock();
-
-                            if (data == null) data = v.getDatatype();
-                            if (v.getDatatype() == null) {
-                                error("Cannot resolve variable datatype for set property "+propName);
-                            }
-                            if (!v.getDatatype().match(data)) {
-                                error(v.getDatatype().generateErrorMsg(data));
-                            }
-                        } else {
-                            match("\n");
-                        }
-                    }
-                    LinkedList<Datatype> datas = new LinkedList<Datatype>();
-                    if (indexer != null) {
-                        for (Variable v: indexer) {
-                            datas.add(v.getDatatype());
-                        }
-                    }
-                    Property p = new Property(propName,data,set,get,datas);
-                    if (propName.equals("this")) {
-                        if (isStatic) error("Static class cannot contain 'this' property.");
-                        if (c.getProperty() != null) error("Duplicate this property.");
-                        c.setProperty(p);
+                        overJumpBlock();
+                        Property prop = new Property(propName,data,null,get,null);
+                        c.newProperty(prop, false);
                     } else {
-                        c.newProperty(p,isStatic);
+                        LinkedList<Variable> indexer = null;
+                        if (isToken("[")) {
+                            indexer = new LinkedList<Variable>();
+                            while (isToken("[")) {
+                                match("[");
+                                String indexerName = getCurrent().getText();
+                                getNext();
+                                Datatype indexerData = null;
+                                if (isToken(":")) {
+                                    indexerData = datatype(true, false);
+                                }
+                                indexer.add(new Variable(indexerName,indexerData));
+                                match("]");
+                            }
+                        }
+                        String propName = getCurrent().getText();
+                        for (Property p: c.getPropertys()) {
+                            if (p.getName().equals(propName)) {
+                                error("Property '"+p.getName()+"' already exists.");
+                            }
+                        }
+                        getNext();
+
+                        Datatype data = null;
+                        if (isToken(":")) {
+                            data = datatype(true,false);
+                        }
+
+                        CodeFunction set = null, get = null;
+
+
+
+                        while (!isToken("end")) {
+                            if (isToken("get")) {
+                                match("get");
+
+
+
+                                if (get != null) error("Duplicate get property.");
+
+                                get = new CodeFunction("get_"+propName,data,new Scope("",this,null));
+                                get.setStartToken(getCurrent());
+                                get.setTyp(CodeFunction.IS_PROPERTY_GET);
+                                if (indexer != null) {
+                                    for (Variable index:indexer) {
+                                        get.getParameter().add(index);
+                                    }
+                                }
+                                get.use();
+                                c.newMethod(isPublic, get, thisVar, superVar,isStatic);
+                                getHyperScope().newFunction(get);
+
+                                //compileFunction(get,null);
+
+                                if (get.getDatatype() != null) {
+                                    data = get.getDatatype();
+                                }
+
+                                overJumpBlock();
+                            } else if (isToken("set")) {
+                                match("set");
+
+                                if (set != null) error("Duplicate set property.");
+
+                                set = new CodeFunction("set_"+propName,new Datatype(Datatype.VOID_DATATYPE,0,null),new Scope("",this,null));
+                                Variable v = set.newParameter(this,"value", null,null);
+                                set.setStartToken(getCurrent());
+                                set.setTyp(CodeFunction.IS_PROPERTY_SET);
+                                set.use();
+                                if (indexer != null) {
+                                    for (Variable index:indexer) {
+                                        set.getParameter().add(index);
+                                    }
+                                }
+                                c.newMethod(isPublic, set, thisVar, superVar,isStatic);
+                                getHyperScope().newFunction(set);
+
+                                //compileFunction(set,null);
+                                overJumpBlock();
+
+                                if (data == null) data = v.getDatatype();
+                                //if (v.getDatatype() == null) {
+                                //    error("Cannot resolve variable datatype for set property "+propName);
+                                //}
+                                //if (!v.getDatatype().match(data)) {
+                                //    error(v.getDatatype().generateErrorMsg(data));
+                                //}
+                            } else {
+                                match("\n");
+                            }
+                        }
+                        LinkedList<Datatype> datas = new LinkedList<Datatype>();
+                        if (indexer != null) {
+                            for (Variable v: indexer) {
+                                datas.add(v.getDatatype());
+                            }
+                        }
+                        Property p = new Property(propName,data,set,get,datas);
+                        if (propName.equals("this")) {
+                            if (isStatic) error("Static class cannot contain 'this' property.");
+                            if (c.getProperty() != null) error("Duplicate this property.");
+                            c.setProperty(p);
+                        } else {
+                            c.newProperty(p,isStatic);
+                        }
+
+                        match("end");
                     }
-                    
-                    match("end");
                 } else if (isToken("generator") && mode == Class.IS_CLASS) {
                     match("generator");
                     if (gen) error("Class can only have maximal one generator.");

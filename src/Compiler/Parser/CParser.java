@@ -32,7 +32,16 @@ public class CParser extends Parser {
         super(analyser,man,filePath);
     }
     public void generate(String template, boolean isMain) {
-        //if (isMain) {
+        for (Import imp: Main.imports) {
+            if (this.getPath().equals(imp.getPath())) {
+                myImport = imp;
+                break;
+            }
+        }
+        if (myImport != null) {
+            headerCode += "#ifndef FILE_" + myImport.getID()+"\n";
+            headerCode += "#define FILE_"+myImport.getID()+"\n";
+        }
         for (Import imp: Main.imports) {
             if (imp.getPath().endsWith("h"))
                 importCode += "#include \""+imp.getPath()+"\""+newLine();
@@ -44,12 +53,7 @@ public class CParser extends Parser {
         //}
         String mainCode = "";
         mainCode = template.substring(template.indexOf("$MAIN_CODE"), template.indexOf("$ENDMAIN_CODE")+"$ENDMAIN_CODE".length());
-        for (Import imp: Main.imports) {
-            if (this.getPath().equals(imp.getPath())) {
-                myImport = imp;
-                break;
-            }
-        }
+        
         if (SyntaxException.wasError) return;
         headerCode += "#ifndef boolean"+newLine();
         headerCode += "#define boolean char"+newLine();
@@ -339,29 +343,9 @@ public class CParser extends Parser {
                 headerCode += "exc_env_"+i;
             }
         }
-            if (CExpressionTry.TRYCOUNT > 0) headerCode += ";"+newLine();
-            /*
-            //defines für die datentypen definieren
-            for (int i = 100; i < 120; i++) {
-                Datatype data = new Datatype(i,0,null);
-                if (data != null && data.getUnsafeID() != -1 && data.getName() != null && !data.isNull() && !data.isVoid()) {
-                    headerCode += "#define TYP_"+data.getName().toUpperCase()+" "+data.getUnsafeID()+newLine();
-                    String name = data.getName();
-                    if (data.isGC()) name = "obj";
-                    headerCode += CExpressionAssignment.getDatatype(data)+" exc_holder_"+name+";"+newLine();
-                }
-            }
-        }*/
+        if (CExpressionTry.TRYCOUNT > 0) headerCode += ";"+newLine();
+        if (myImport != null) headerCode += "#endif\n";
         
-        /*
-        for (Import imp: getImports()) {
-            if (imp.getPath().endsWith("ly")) {
-                importCode += "#include \"file"+imp.getID()+".h\""+newLine();
-            }
-        }
-
-        importCode += "#include \"file"+myImport.getID()+".h\""+newLine();
-        */
         if (isMain) {
             template = template.replace("$MAIN_CODE","");
             template = template.replace("$ENDMAIN_CODE","");
@@ -373,10 +357,6 @@ public class CParser extends Parser {
         template = template.replace("$FUNCTION_CODE", functionCode);
         this.template = template;
 
-        //headerCode = "#define INCLUDEFILE"+myImport.getID() + newLine() + headerCode;
-        //headerCode = "#ifndef INCLUDEFILE"+myImport.getID() + newLine() + headerCode;
-        
-        //headerCode += "#endif"+newLine();
     }
 
     public void addAutoArray(CExpressionAutoArray arr) {

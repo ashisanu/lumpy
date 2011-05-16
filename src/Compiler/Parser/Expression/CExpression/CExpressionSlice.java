@@ -1,5 +1,6 @@
 package Compiler.Parser.Expression.CExpression;
 
+import Compiler.Datatype;
 import Compiler.Parser.Expression.Expression;
 import Compiler.Parser.Expression.ExpressionIdentifier;
 import Compiler.Parser.Expression.ExpressionSlice;
@@ -18,7 +19,17 @@ public class CExpressionSlice extends ExpressionSlice {
     @Override
     public String generate() {
         String str = "";
-        str += "sliceArray("+self.generate() + ",";
+        String add = "";
+        boolean isStr = false;
+        try {
+            if (self.getDatatype().match(new Datatype(Datatype.STRING_DATATYPE,0,null))) {
+                //add ="-> data";
+                isStr = true;
+            }
+        } catch (SyntaxException ex) {
+            System.err.println("WTF");
+        }
+        str += "sliceArray("+self.generate() + add + ",";
         if (start != null && end != null) {
             str += start.generate()+", "+end.generate();
         } else if (start == null && end != null) {
@@ -29,10 +40,22 @@ public class CExpressionSlice extends ExpressionSlice {
             str += "0, 0";
         }
         try {
-            str += ",sizeof(" + CExpressionAssignment.getArrayDatatype(self.getDatatype())+ ")";
+            String typ = "";
+            if (isStr) {
+                typ = "char";
+            } else {
+                typ = CExpressionAssignment.getArrayDatatype(self.getDatatype());
+            }
+            str += ",sizeof(" + typ + ")";
         } catch(SyntaxException ex) {}
+
+        if (isStr) {
+            str += ", 1";
+        } else {
+            str += ", 0";
+        }
+
         str += ")";
-        
         return str;
     }
 }

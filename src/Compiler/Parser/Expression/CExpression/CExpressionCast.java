@@ -27,6 +27,8 @@ public class CExpressionCast extends ExpressionCast {
         String str = "";
         if (getDatatypeTo().getName().equals("string")) {
             str = getDatatypeFrom().getName()+"2"+getDatatypeTo().getName()+"("+getExpression().generate()+")";
+        } else if(getDatatypeFrom().getName().equals("string") && !getDatatypeTo().isClass()) {
+            str = getDatatypeFrom().getName()+"2"+getDatatypeTo().getName()+"("+getExpression().generate()+")";
         } else if (getDatatypeTo().isClass()) {
             return getExpression().generate();
         } else {
