@@ -7,8 +7,8 @@ Lumpy uses a "milestone system". Every milestone is an important point in the de
 
 = Details =
  * Milestone 0: ~~Implement _core_ features.~~
- * Milestone 1: (Current) Implement all language features (look at "future syntax")
- * Milestone 2: Simple standard library for input/output, datastructures and general bugfixing
+ * Milestone 1: ~~Implement all language features (look at "future syntax", deleted because no more entries)~~
+ * Milestone 2: (Current)Simple standard library for input/output, datastructures and general bugfixing
  * Milestone 3: Compile and execute under linux and Mac OS X
  * Milestone 4: Libraries for:
    # Graphics
