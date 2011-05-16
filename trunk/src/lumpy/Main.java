@@ -15,7 +15,7 @@ import java.util.*;
  * @author Coolo
  */
 public class Main {
-    public static LinkedList<Import> imports = new LinkedList<Import>();
+        public static LinkedList<Import> imports = new LinkedList<Import>();
     /**
      * @param args the command line arguments
      */
@@ -26,16 +26,6 @@ public class Main {
             System.out.flush();
             Parser mainParser = new CParser(new Lexer(input), new ExpressionManagerC(),"/");
             mainParser.compile();
-            boolean notCompiled = true;
-            while (notCompiled) {
-                notCompiled = false;
-                for (Import imp2: Main.imports) {
-                    if (imp2.getParser()!= null && !imp2.getParser().isAlreadyCompiled()) {
-                        notCompiled = true;
-                        imp2.getParser().compile();
-                    }
-                }
-            }
             
             if (!SyntaxException.wasError) {
                 mainParser.generate(template,true);

@@ -46,7 +46,7 @@ public class CExpressionAssignment extends ExpressionAssignment {
 
     public static String getRealDatatype(Datatype typ) {
         String str = typ.toString().replace("[]","*");
-        if (str.length() >6 && str.substring(0, 6).equals("string")) {
+        if (str.replace("*","").equals("string")) {
             str = "char*"+str.substring(7);
         }
         return str;

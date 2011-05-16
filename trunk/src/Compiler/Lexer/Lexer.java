@@ -31,11 +31,13 @@ public class Lexer {
             for (int j = 0;j<=line.length();j++) {
                 for (String s: split) {
                     if ((j + s.length()) <= line.length() && s.equals(line.substring(j,  j + s.length()))) {
-                        Token t = new Token(line.substring(lastFound, j),line,i,lastFound);
-                        tokens.add(t);
+                        Token t1 = new Token(line.substring(lastFound, j),line,i,lastFound);
+                        tokens.add(t1);
                         
-                        t = new Token(s,line,i,j);
-                        tokens.add(t);
+                        Token t2 = new Token(s,line,i,j);
+                        tokens.add(t2);
+
+                        
 
                         lastFound = j + s.length();
                         j += s.length() - 1;
@@ -152,9 +154,9 @@ public class Lexer {
                 it.remove();
         }
         tokens.addLast(new Token("","",0,0));
-
+        
         for (Token tok: tokens) {
-        //    System.out.println(tok.getText());
+            //System.out.println(tok.getText());
         }
     }
     

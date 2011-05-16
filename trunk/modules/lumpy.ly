@@ -18,6 +18,7 @@ end
 import "lumpy/datatypes.ly"
 import "lumpy/exceptions.ly"
 import "lumpy/linkedlist.ly"
+import "lumpy/checkedarray.ly"
 
 extern
 	function gccollect:void() = "gccollect"
