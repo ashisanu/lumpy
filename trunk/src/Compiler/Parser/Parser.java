@@ -2514,10 +2514,6 @@ public abstract class Parser {
             } else {
                 error("Cannot call 'yield' in non generator.");
             }
-        } else if (isToken("increment")) {
-            boolean inc = isToken("increment");
-            match("increment");
-            return getManager().getIncDecExpression(variableExpression(), inc);
         } else if (isToken("return")) {
             match("return");
 

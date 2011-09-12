@@ -186,11 +186,7 @@ public abstract class ExpressionManager {
      */
     public abstract ExpressionProperty getPropertyExpression(Property prop,ExpressionIdentifier self);
 
-    /**
-     * Increment/Decrement expression
-     */
-    public abstract ExpressionIncDec getIncDecExpression(ExpressionIdentifier var, boolean inc);
-    /**
+     /**
      * Ein Try block
      * @param mainBlock
      * @param catches
