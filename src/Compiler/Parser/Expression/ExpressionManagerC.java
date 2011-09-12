@@ -204,13 +204,6 @@ public class ExpressionManagerC extends ExpressionManager {
     }
 
     /**
-     * INc/Dec in C
-     */
-    public ExpressionIncDec getIncDecExpression(ExpressionIdentifier var, boolean inc) {
-        return new CExpressionIncDec(getParser(),var,inc);
-    }
-
-    /**
      * Try Expression
      */
     public ExpressionTry getTryExpression(ExpressionBlock mainBlock, LinkedList<ExpressionBlock> catches, LinkedList<Datatype> datas, ExpressionBlock finallyBlock, String variableName) {
