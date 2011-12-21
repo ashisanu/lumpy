@@ -155,9 +155,9 @@ public class Lexer {
         }
         tokens.addLast(new Token("","",0,0));
         
-        for (Token tok: tokens) {
+        //for (Token tok: tokens) {
             //System.out.println(tok.getText());
-        }
+        //}
     }
     
     /**

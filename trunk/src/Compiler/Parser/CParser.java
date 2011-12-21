@@ -288,51 +288,6 @@ public class CParser extends Parser {
                 functionCode += newLine();
                 functionCode += "}";
                 functionCode += newLine();
-
-                /* old alloc
-                 *  String head = "";
-                head += "GCNode* allocarray_"+i+"_(int size";
-                String all = "";
-                for (int j = 0; j<i;j++) {
-                    head += ", int param"+j;
-                    all += "param"+j+"*";
-                }
-                head += ")";
-                all += "1";
-
-                headerCode += head+";"+newLine();
-
-                identUp();
-                functionCode += head+" {"+newLine();
-                String c = "*";
-                for (int j = 1 ;j<i;j++) c += "*";
-                functionCode += "int"+c+" arr = malloc(size*param0);"+newLine();
-                for (int j = 1; j<i;j++) {
-                    functionCode += "int var"+j+";"+newLine();
-                    identUp();
-                    functionCode += "for (var"+j+" = 0;var"+j+" < param"+j+"; var"+j+"++) {"+newLine();
-                    functionCode += "arr";
-                    for (int k = 0;k<j;k++) {
-                        functionCode += "[var"+(k+1)+"]";
-                    }
-                    functionCode +=" = malloc(size*param"+j+");"+newLine();
-                }
-
-                for (int j = 1; j<i;j++) {
-                    identDown();
-                    functionCode += newLine();
-                    functionCode += "}";
-                    functionCode += newLine();
-                }
-                functionCode += "GCNode* node = gc_malloc(0,&standardTrace);"+newLine();
-                functionCode += "node -> data = arr;"+newLine();
-                functionCode += "node -> size = size*"+all+";"+newLine();;
-                functionCode += "return node;"+newLine();
-                identDown();
-                functionCode += newLine();
-                functionCode += "}";
-                functionCode += newLine();
-                 */
             }
         }
         
@@ -413,6 +368,15 @@ public class CParser extends Parser {
             int i = 0;
             while ((i = strm.read()) != -1 ) {
                 System.out.print((char)i);
+            }
+	    
+	    for (Import imp: other) {
+		command = "";
+                if (imp.getParser() != null)
+                    command = userDir+"/file"+imp.getID()+".o";
+		if (!command.equals("")) {
+		    Runtime.getRuntime().exec("rm "+command);
+		}
             }
         } catch (IOException ex) {
             System.err.println("error.");
